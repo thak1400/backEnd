@@ -16,6 +16,12 @@ app.get('/hw', (req, res) => {
     });
 });
 
+app.get('/hello', (req, res) => {
+    return res.status(200).json({
+        message: 'Hello World!!! Im Shivang'
+    });
+});
+
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
