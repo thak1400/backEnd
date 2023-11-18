@@ -25,6 +25,6 @@ jobs:
           switches: -avzr --delete
           path: ./*
           remote_path: /var/www/shwift/
-          remote_host: http://18.224.228.0
+          remote_host: 18.224.228.0
           remote_user: ubuntu
           remote_key: "${{ secrets.SSH_PRIVATE_KEY }}"
