@@ -24,7 +24,7 @@ app.get('/hello', (req, res) => {
 
 app.get('/update', (req, res) => {
     return res.status(200).json({
-        message: 'Hello World!!! Im Shivang! Im auto updating'
+        message: 'Hello World!!! Im Shivang! Im updating'
     });
 });
 
