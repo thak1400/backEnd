@@ -28,3 +28,5 @@ jobs:
           remote_host: 18.224.228.0
           remote_user: ubuntu
           remote_key: "${{ secrets.SSH_PRIVATE_KEY }}"
+
+      - run: pm2 start 1 --watch
