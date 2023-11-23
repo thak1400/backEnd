@@ -76,6 +76,27 @@ export const newApplication = async (request, response) => {
     }
 }
 
+export const getListing = async (request, response) => {
+    try{
+        const shwiftRepo = new ShwiftRepository();
+        const result = await shwiftRepo.fetchListing();
+        if(result) {
+            console.log(`getListing successful`);
+            response.status(200).send(result);
+        } else {
+            console.error(`getListing Failed  - ${JSON.stringify(request.param)}`);
+            response.status(400).send({
+                type: 'BAD_REQUEST',
+                message: 'Request failed before completion',
+                details: 'Invalid Input request'
+            });
+        }
+    } catch(error) {
+        console.log(`getListing failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+}
+
 export const updateApplication = async (request, response) => {
     try{
         if(request.body && typeof request.body === ('object')) {
@@ -96,6 +117,29 @@ export const updateApplication = async (request, response) => {
         }
     } catch(error) {
         console.log(`updateApplication failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+}
+
+export const getApplications = async (request, response) => {
+    try{
+        const shwiftRepo = new ShwiftRepository();
+        const { orgName } = request.params;
+        const { jobId } = request.query;
+        const result = await shwiftRepo.fetchApplication(orgName, jobId);
+        if(result) {
+            console.log(`getApplications successful`);
+            response.status(200).send(result);
+        } else {
+            console.error(`getApplications Failed  - ${JSON.stringify(request.param)}`);
+            response.status(400).send({
+                type: 'BAD_REQUEST',
+                message: 'Request failed before completion',
+                details: 'Invalid Input request'
+            });
+        }
+    } catch(error) {
+        console.log(`getApplications failed - ${JSON.stringify(error)}`);
         response.status(500).send(error);
     }
 }

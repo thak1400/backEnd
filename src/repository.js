@@ -41,6 +41,25 @@ export class ShwiftRepository {
         }
     }
 
+    async fetchListing() {
+        const connection = await dbSetup();
+        try{
+            const getListing = `SELECT * FROM shwift.employerlisting;`;
+            const dbResultGetListing = await connection.dbClient.query(getListing);
+            if(dbResultGetListing.rowCount){
+                return dbResultGetListing.rows;
+            } else {
+                throw Error('Transaction Failed');
+            }
+        } catch(error) {
+            if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
+
     async newApplication(applicationId, applicationData) {
         const connection = await dbSetup();
         try{
@@ -74,6 +93,29 @@ export class ShwiftRepository {
                 return dbResultUpdateApplication.rows[0];
             } else {
                 throw Error('Transaction Failed');
+            }
+        } catch(error) {
+            if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
+    
+    async fetchApplication(orgName, jobId) {
+        const connection = await dbSetup();
+        try{
+            let getApp = `SELECT * FROM shwift.myapplications where org_name = '${orgName}'`;
+            if(jobId) {
+                getApp += ` and job_id = '${jobId}'`;
+            }
+            getApp += `;`;
+            const dbResultGetApp = await connection.dbClient.query(getApp);
+            if(dbResultGetApp.rowCount){
+                return dbResultGetApp.rows;
+            } else {
+                return [];
             }
         } catch(error) {
             if(error){
