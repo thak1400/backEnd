@@ -146,6 +146,8 @@ export class ShwiftRepository {
             connection.dbClient.release();
         }
     }
+
+
     async signUp(userData) {
         const connection = await dbSetup();
         try{
@@ -167,4 +169,28 @@ export class ShwiftRepository {
             connection.dbClient.release();
         }
     }
+
+    async updatePswd(emailId,userData) {
+        const connection = await dbSetup();
+        try{ 
+            console.log(emailId);
+            console.log(userData);
+            const updatePswd = `UPDATE shwift.userinfo SET first_name='${userData.firstName}', last_name='${userData.lastName}', pswd='${userData.pSWD}', acc_type='${userData.accType}', phone_num='${userData.phoneNum}'
+            WHERE email_id='${userData.emailId}' returning *;`;
+            console.log(updatePswd);
+            const dbResultResetPwd = await connection.dbClient.query(updatePswd);
+            if(dbResultResetPwd.rowCount){
+                return dbResultResetPwd.rows[0];
+            } else {
+                throw Error('Transaction Failed');
+            }
+        } catch(error) {
+            if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
+
 }

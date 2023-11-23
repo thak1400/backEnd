@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'; // load environment variables from .env file
 import express from 'express';
 import bodyParser from "body-parser";
-import { createListing, deleteListing, newApplication, updateApplication, getApplications, getListing, updateListing, signUp } from './app.js';
+import { createListing, deleteListing, newApplication, updateApplication, getApplications, getListing, updateListing, signUp, updatePswd } from './app.js';
 dotenv.config();
 const app = express();
 app.use(bodyParser.json())
@@ -33,6 +33,8 @@ app.patch('/shwift/application', updateApplication);
 app.patch('/shwift/listing', updateListing);
 
 app.post('/shwift/signUp', signUp);
+
+app.patch('/shwift/updatePswd', updatePswd);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
