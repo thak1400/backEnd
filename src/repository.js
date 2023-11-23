@@ -146,4 +146,25 @@ export class ShwiftRepository {
             connection.dbClient.release();
         }
     }
+    async signUp(userData) {
+        const connection = await dbSetup();
+        try{
+            console.log(userData);
+            const signUp = `INSERT into shwift.userinfo (first_name,last_name,email_id,pswd,acc_type,phone_num) 
+            values ('${userData.firstName}','${userData.lastName}','${userData.emailId}','${userData.pSWD}','${userData.accType}','${userData.phoneNum}') RETURNING *;`;
+            console.log(signUp);
+            const dbResultNewAccount = await connection.dbClient.query(signUp);
+            if(dbResultNewAccount.rowCount){
+                return dbResultNewAccount.rows[0];
+            } else {
+                throw Error('Transaction Failed');
+            }
+        } catch(error) {
+            if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
 }
