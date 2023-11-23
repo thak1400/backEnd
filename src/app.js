@@ -25,3 +25,77 @@ export const createListing = async (request, response) => {
         response.status(500).send(error);
     }
 }
+
+
+export const deleteListing = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const {jobId} = request.body;
+            // const jobId = uuid();
+            const result = await shwiftRepo.removeListing(jobId);
+            if(result) {
+                console.log(`deleteListing successful`);
+                response.status(200).send(result);
+            } else {
+                console.error(`deleteListing Failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`deleteListing failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+}
+export const newApplication = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const applicationId=uuid();
+            const applicationData=request.body;
+            const result = await shwiftRepo.newApplication(applicationId,applicationData);
+            if(result) {
+                console.log(`newApplication successful`);
+                response.status(200).send(result);
+            } else {
+                console.error(`newApplication Failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`newApplication failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+}
+
+export const updateApplication = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const applicationData=request.body;
+            const result = await shwiftRepo.updateApplication(applicationData.applicationId,applicationData);
+            if(result) {
+                console.log(`updateApplication successful`);
+                response.status(200).send(result);
+            } else {
+                console.error(`updateApplication Failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`updateApplication failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+}

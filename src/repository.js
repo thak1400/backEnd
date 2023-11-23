@@ -20,4 +20,67 @@ export class ShwiftRepository {
             connection.dbClient.release();
         }
     }
+
+    async removeListing(jobId) {
+        const connection = await dbSetup();
+        try{
+            console.log(jobId); 
+            const deleteListing = `DELETE from shwift.employerlisting WHERE job_id='${jobId}' RETURNING *;`;
+            const dbResultDeletetListing = await connection.dbClient.query(deleteListing);
+            if(dbResultDeletetListing.rowCount){
+                return dbResultDeletetListing.rows[0];
+            } else {
+                throw Error('Transaction Failed');
+            }
+        } catch(error) {
+            if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
+
+    async newApplication(applicationId, applicationData) {
+        const connection = await dbSetup();
+        try{
+            console.log(applicationId); 
+            const insertApplication = `INSERT into shwift.myapplications (applicant_id,application_id,job_title,org_name,app_date,application_status,job_id) 
+            values ('${applicationData.applicantID}','${applicationId}','${applicationData.jobTitle}','${applicationData.orgName}','${applicationData.applicationDate}','${applicationData.applicationStatus}','${applicationData.jobId}') RETURNING *;`;
+            const dbResultInsertApplication = await connection.dbClient.query(insertApplication);
+            if(dbResultInsertApplication.rowCount){
+                return dbResultInsertApplication.rows[0];
+            } else {
+                throw Error('Transaction Failed');
+            }
+        } catch(error) {
+            if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
+
+    async updateApplication(applicationId,applicationData) {
+        const connection = await dbSetup();
+        try{
+            console.log(applicationId); 
+            const updateApplication = `UPDATE  shwift.myapplications SET applicant_id='${applicationData.applicantID}', job_title='${applicationData.jobTitle}', org_name='${applicationData.orgName}', app_date='${applicationData.applicationDate}', application_status='${applicationData.applicationStatus}', job_id='${applicationData.jobId}'
+            WHERE  application_id='${applicationId}' RETURNING *;`;
+            // console.log(updateApplication);
+            const dbResultUpdateApplication = await connection.dbClient.query(updateApplication);
+            if(dbResultUpdateApplication.rowCount){
+                return dbResultUpdateApplication.rows[0];
+            } else {
+                throw Error('Transaction Failed');
+            }
+        } catch(error) {
+            if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
 }
