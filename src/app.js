@@ -143,3 +143,26 @@ export const getApplications = async (request, response) => {
         response.status(500).send(error);
     }
 }
+export const updateListing = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const listingData=request.body;
+            const result = await shwiftRepo.updateListing(listingData.jobId,listingData);
+            if(result) {
+                console.log(`updateListing successful`);
+                response.status(200).send(result);
+            } else {
+                console.error(`updateListing Failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`updateListing failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+}

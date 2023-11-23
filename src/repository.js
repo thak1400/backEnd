@@ -125,4 +125,25 @@ export class ShwiftRepository {
             connection.dbClient.release();
         }
     }
+
+    async updateListing(jobId,listingData) {
+        const connection = await dbSetup();
+        try{ 
+            const updateListing = `UPDATE shwift.employerlisting SET job_title='${listingData.jobTitle}', job_desc='${listingData.jobDescription}', job_req='${listingData.jobRequirement}', job_priority='${listingData.jobPriority}', pay_scale='${listingData.payScale}', num_hours='${listingData.numHours}', job_location='${listingData.jobLocation}', position_type='${listingData.positionType}', position_start_date='${listingData.startDate}', application_deadline='${listingData.appDeadline}', recruiter_name='${listingData.recruiterName}' 
+            WHERE job_id='${jobId}' returning *;`;
+            console.log(updateListing);
+            const dbResultUpdateListing = await connection.dbClient.query(updateListing);
+            if(dbResultUpdateListing.rowCount){
+                return dbResultUpdateListing.rows[0];
+            } else {
+                throw Error('Transaction Failed');
+            }
+        } catch(error) {
+            if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
 }
