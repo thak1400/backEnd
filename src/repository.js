@@ -193,4 +193,25 @@ export class ShwiftRepository {
         }
     }
 
+    async login(emailId,password) {
+        const connection = await dbSetup();
+        try{ 
+            let login = `SELECT * FROM shwift.userinfo where email_id='${emailId}' and pswd='${password}' `;
+            // console.log(emailId);
+            console.log(login);
+            const dbResultLogin = await connection.dbClient.query(login);
+            if(dbResultLogin.rowCount){
+                return dbResultLogin.rows[0];
+            } else {
+                throw Error('Transaction Failed');
+            }
+        } catch(error) {
+            if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
+
 }

@@ -217,5 +217,35 @@ export const updatePswd = async (request, response) => {
         console.log(`updatePswd failed - ${JSON.stringify(error)}`);
         response.status(500).send(error);
     }
-    
+        
+}
+
+export const login = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const {userName}=request.params;
+            const {password}=request.query;
+            console.log(request);
+            console.log(userName);
+            console.log(password);
+            console.log("Calling login pswd");
+            const result = await shwiftRepo.login(userName,password);
+            if(result) {
+                console.log(`login successful`);
+                response.status(200).send(result);
+            } else {
+                console.error(`login Failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`login failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+        
 }
