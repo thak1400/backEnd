@@ -250,7 +250,7 @@ export class ShwiftRepository {
             console.log(deleteQuery);
             const dbResultDeletedJob = await connection.dbClient.query(deleteQuery);
             if(dbResultDeletedJob.rowCount){
-                return dbResultDeletedJob.rows[0];
+                return "Deleted successfully";
             } else {
                 throw Error('Transaction Failed');
             }
