@@ -168,6 +168,32 @@ export const updateListing = async (request, response) => {
     }
     
 }
+// export const signUp = async (request, response) => {
+//     try{
+//         if(request.body && typeof request.body === ('object')) {
+//             const shwiftRepo = new ShwiftRepository();
+//             const userData=request.body;
+//             console.log(userData);
+//             const result = await shwiftRepo.signUp(userData);
+//             if(result) {
+//                 console.log(`signUp successful`);
+//                 response.status(200).send(result);
+//             } else {
+//                 console.error(`signUp Failed  - ${JSON.stringify(request.body)}`);
+//                 response.status(400).send({
+//                     type: 'BAD_REQUEST',
+//                     message: 'Request failed before completion',
+//                     details: 'Invalid Input request'
+//                 });
+//             }
+//         }
+//     } catch(error) {
+//         console.log(`signUp failed - ${JSON.stringify(error)}`);
+//         response.status(500).send(error);
+//     }
+    
+// }
+
 export const signUp = async (request, response) => {
     try{
         if(request.body && typeof request.body === ('object')) {
@@ -188,7 +214,7 @@ export const signUp = async (request, response) => {
             }
         }
     } catch(error) {
-        console.log(`signUp failed - ${JSON.stringify(error)}`);
+        console.log(`signUp2 failed - ${JSON.stringify(error)}`);
         response.status(500).send(error);
     }
     
@@ -357,3 +383,28 @@ export const deleteSavedJob = async (request, response) => {
     
 }
 
+export const fetchAllEmployeeInfo = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const {emailId} = request.body;
+            console.log(emailId);
+            const result = await shwiftRepo.fetchAllEmployeeInfo(emailId);
+            if(result) {
+                console.log(`fetchAllEmployeeInfo successfully`);
+                response.status(200).send(result);
+            } else {
+                console.error(`fetchAllEmployeeInfo failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`fetchAllEmployeeInfo failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+    
+}

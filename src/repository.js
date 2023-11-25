@@ -319,7 +319,60 @@ export class ShwiftRepository {
         connection.dbClient.release();
     }
 }
- }
+
+async signUp(userData) {
+    const connection = await dbSetup();
+    try{
+        console.log(userData);
+        const signUp = `INSERT into shwift.userinfo (first_name,last_name,email_id,pswd,acc_type,phone_num) 
+        values ('${userData.firstName}','${userData.lastName}','${userData.emailId}','${userData.pSWD}','${userData.accType}','${userData.phoneNum}') RETURNING *;`;
+        console.log(signUp);
+        const dbResultNewAccount = await connection.dbClient.query(signUp);
+        if(dbResultNewAccount.rowCount){
+            
+            if(dbResultNewAccount.rows[0].acc_type.toLowerCase()==="employee")
+            {
+                const signUpInfo=`INSERT into shwift.employeeinfo (first_name,last_name,employee_id)
+                values ('${dbResultNewAccount.rows[0].first_name}','${dbResultNewAccount.rows[0].last_name}','${dbResultNewAccount.rows[0].email_id}') RETURNING *;`;
+                // console.log(signUpInfo);
+                const dbsignUpInfo=await connection.dbClient.query(signUpInfo);
+                // console.log(dbsignUpInfo.rowCount);
+                // console.log(dbsignUpInfo.rows[0]);
+            }
+            return dbResultNewAccount.rows[0];
+        } else {
+            throw Error('Transaction Failed');
+        }
+    } catch(error) {
+        if(error){
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
+async fetchAllEmployeeInfo(emailId) {
+    const connection = await dbSetup();
+    try{
+        const fetchAllEmployeeInfo = `SELECT * from shwift.employeeinfo where employee_id='${emailId}' ;`;
+        console.log(fetchAllEmployeeInfo);
+        const dbfetchAllEmployeeInfo = await connection.dbClient.query(fetchAllEmployeeInfo);
+        if(dbfetchAllEmployeeInfo.rowCount){
+            return dbfetchAllEmployeeInfo.rows[0];
+        } else {
+            throw Error('Transaction Failed');
+        }
+    } catch(error) {
+        if(error){
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
+}
 
 
 
