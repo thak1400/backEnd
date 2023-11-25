@@ -150,28 +150,6 @@ export class ShwiftRepository {
     }
 
 
-    async signUp(userData) {
-        const connection = await dbSetup();
-        try{
-            console.log(userData);
-            const signUp = `INSERT into shwift.userinfo (first_name,last_name,email_id,pswd,acc_type,phone_num) 
-            values ('${userData.firstName}','${userData.lastName}','${userData.emailId}','${userData.pSWD}','${userData.accType}','${userData.phoneNum}') RETURNING *;`;
-            console.log(signUp);
-            const dbResultNewAccount = await connection.dbClient.query(signUp);
-            if(dbResultNewAccount.rowCount){
-                return dbResultNewAccount.rows[0];
-            } else {
-                throw Error('Transaction Failed');
-            }
-        } catch(error) {
-            if(error){
-                throw new Error(error.message);
-            }
-        } finally {
-            connection.dbClient.release();
-        }
-    }
-
     async updatePswd(emailId,userData) {
         const connection = await dbSetup();
         try{ 
@@ -323,21 +301,17 @@ export class ShwiftRepository {
 async signUp(userData) {
     const connection = await dbSetup();
     try{
-        console.log(userData);
         const signUp = `INSERT into shwift.userinfo (first_name,last_name,email_id,pswd,acc_type,phone_num) 
         values ('${userData.firstName}','${userData.lastName}','${userData.emailId}','${userData.pSWD}','${userData.accType}','${userData.phoneNum}') RETURNING *;`;
-        console.log(signUp);
         const dbResultNewAccount = await connection.dbClient.query(signUp);
         if(dbResultNewAccount.rowCount){
             
             if(dbResultNewAccount.rows[0].acc_type.toLowerCase()==="employee")
             {
-                const signUpInfo=`INSERT into shwift.employeeinfo (first_name,last_name,employee_id)
-                values ('${dbResultNewAccount.rows[0].first_name}','${dbResultNewAccount.rows[0].last_name}','${dbResultNewAccount.rows[0].email_id}') RETURNING *;`;
-                // console.log(signUpInfo);
+                const signUpInfo=`INSERT into shwift.employeeinfo (first_name,last_name,employee_id,curr_employment_status,employee_gender,employee_dob,emp_expertise,rating,employee_dp,curr_position,emp_summary,emp_projects,emp_skills,emp_workex,emp_education)
+                values ('${dbResultNewAccount.rows[0].first_name}','${dbResultNewAccount.rows[0].last_name}','${dbResultNewAccount.rows[0].email_id}','','','','',0,'','','','','','','') RETURNING *;`;
+                console.log(signUpInfo);
                 const dbsignUpInfo=await connection.dbClient.query(signUpInfo);
-                // console.log(dbsignUpInfo.rowCount);
-                // console.log(dbsignUpInfo.rows[0]);
             }
             return dbResultNewAccount.rows[0];
         } else {
@@ -360,6 +334,26 @@ async fetchAllEmployeeInfo(emailId) {
         const dbfetchAllEmployeeInfo = await connection.dbClient.query(fetchAllEmployeeInfo);
         if(dbfetchAllEmployeeInfo.rowCount){
             return dbfetchAllEmployeeInfo.rows[0];
+        } else {
+            throw Error('Transaction Failed');
+        }
+    } catch(error) {
+        if(error){
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
+async updateEmployeeInfo(emailId,key,value) {
+    const connection = await dbSetup();
+    try{
+        const updateEmployeeInfo = `UPDATE shwift.employeeinfo SET ${key}='${value}' WHERE employee_id='${emailId}' returning *;`;
+        console.log(updateEmployeeInfo);
+        const dbupdateEmployeeInfo = await connection.dbClient.query(updateEmployeeInfo);
+        if(dbupdateEmployeeInfo.rowCount){
+            return dbupdateEmployeeInfo.rows[0];
         } else {
             throw Error('Transaction Failed');
         }
