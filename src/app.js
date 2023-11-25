@@ -6,6 +6,7 @@ export const createListing = async (request, response) => {
         if(request.body && typeof request.body === ('object')) {
             const shwiftRepo = new ShwiftRepository();
             const listingData = request.body;
+            console.log(request);
             const jobId = uuid();
             const result = await shwiftRepo.addListing(jobId, listingData);
             if(result) {
@@ -246,6 +247,60 @@ export const login = async (request, response) => {
     } catch(error) {
         console.log(`login failed - ${JSON.stringify(error)}`);
         response.status(500).send(error);
-    }
-        
+    } 
+}
+
+export const fetchSavedJobs = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            console.log(request);
+            const {emailId}=request.params;
+            const {jobId}=request.query;
+            console.log("Calling fetchSavedJobs");
+            console.log(jobId);
+            const result = await shwiftRepo.fetchSavedJobs(emailId,jobId);
+            if(result) {
+                console.log(`fetchSavedJobs successful`);
+                response.status(200).send(result);
+            } else {
+                console.error(`fetchSavedJobs Failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`fetchSavedJobs failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    } 
+}
+
+export const fetchSpecificListing = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            // const {jobId}=request.query;
+            const {emailId}=request.body;
+            // console.log(jobId);
+            console.log("Calling fetchSpecificListing");
+            const result = await shwiftRepo.fetchSpecificListing(emailId);
+            if(result) {
+                console.log(`fetchSpecificListing successful`);
+                response.status(200).send(result);
+            } else {
+                console.error(`fetchSpecificListing Failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`fetchSpecificListing failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    } 
 }
