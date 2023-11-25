@@ -4,9 +4,11 @@ export class ShwiftRepository {
     async addListing(jobId, listingData) {
         const connection = await dbSetup();
         try{
-            const insertListing = `INSERT into shwift.employerlisting (job_id, job_title, job_desc, job_req, job_priority, pay_scale, num_hours, job_location, position_type, position_start_date, application_deadline, recruiter_name) 
-                                VALUES ('${jobId}', '${listingData.jobTitle}', '${listingData.jobDescription}', '${listingData.jobRequirement}', '${listingData.jobPriority}', '${listingData.payScale}', '${listingData.numHours}', '${listingData.jobLocation}', '${listingData.positionType}', '${listingData.startDate}', '${listingData.appDeadline}', '${listingData.recruiterName}') returning *;`;
+            const insertListing = `INSERT into shwift.employerlisting (job_id, job_title, job_desc, job_req, job_priority, pay_scale, num_hours, job_location, position_type, position_start_date, application_deadline, recruiter_name, job_saved,position_onsite) 
+                                VALUES ('${jobId}', '${listingData.jobTitle}', '${listingData.jobDescription}', '${listingData.jobRequirement}', '${listingData.jobPriority}', '${listingData.payScale}', '${listingData.numHours}', '${listingData.jobLocation}', '${listingData.positionType}', '${listingData.startDate}', '${listingData.appDeadline}', '${listingData.recruiterName}','false','${listingData.positionOnsite}') returning *;`;
+                                console.log(insertListing);
             const dbResultInsertListing = await connection.dbClient.query(insertListing);
+            // console.log(insertListing);
             if(dbResultInsertListing.rowCount){
                 return dbResultInsertListing.rows[0];
             } else {
@@ -260,4 +262,64 @@ export class ShwiftRepository {
             connection.dbClient.release();
         }
     }
+    async fetchSavedJobs(emailId,jobId) {
+        const connection = await dbSetup();
+        try{ 
+            let fetchSavedJobs = `SELECT * FROM shwift.saved_jobs where email_id='${emailId}' and job_id='${jobId}' `;
+            console.log(emailId);
+            console.log(fetchSavedJobs);
+            const dbfetchSavedJobs = await connection.dbClient.query(fetchSavedJobs);
+            if(dbfetchSavedJobs.rowCount){
+                return dbfetchSavedJobs.rows[0];
+            } else {
+                throw Error('Transaction Failed');
+            }
+        } catch(error) {
+            if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
+
+    async fetchSpecificListing(emailId) {
+    const connection = await dbSetup();
+    try{
+        const fetchSpecificListing = `SELECT * FROM shwift.employerlisting;`;
+        const dbGetAllListings = await connection.dbClient.query(fetchSpecificListing);
+        if(dbGetAllListings.rowCount){
+            
+            for(let i=0;i<dbGetAllListings.rowCount;i++)
+            {
+                const currJobId=dbGetAllListings.rows[i].job_id;
+                console.log(currJobId);
+                const fetchFromSavedJobsTbl=`SELECT * FROM shwift.saved_jobs where email_id='${emailId}' and job_id='${currJobId}' `;
+                console.log(fetchFromSavedJobsTbl);
+                const dbfetchFromSavedJobsTbl = await connection.dbClient.query(fetchFromSavedJobsTbl);
+                console.log(dbfetchFromSavedJobsTbl.rowCount);
+                if(dbfetchFromSavedJobsTbl.rowCount)
+                {
+                    dbGetAllListings.rows[i].job_saved=true;
+                }
+                else{
+                    dbGetAllListings.rows[i].job_saved=false;
+                }
+            }
+            // console.log(dbResultGetSpecificListing.rows);    
+            return dbGetAllListings.rows;
+        } else {
+            throw Error('Transaction Failed');
+        }
+    } catch(error) {
+        if(error){
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
 }
+ }
+
+
+
