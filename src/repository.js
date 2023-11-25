@@ -214,4 +214,50 @@ export class ShwiftRepository {
         }
     }
 
+    async saveJob(emailId,jobId) {
+        const connection = await dbSetup();
+        try{
+            const check = `SELECT * FROM shwift.saved_jobs WHERE email_id = '${emailId}' AND job_id = '${jobId}';`;
+            const dbResultCheckSaved = await connection.dbClient.query(check);
+            if(dbResultCheckSaved.rowCount){
+                throw Error('Transaction Failed');
+            } else {
+                const saveJobInDB = `INSERT into shwift.saved_jobs (email_id,job_id) 
+                values ('${emailId}','${jobId}') RETURNING *;`;
+                console.log(saveJobInDB);
+                const dbResultSavedJob = await connection.dbClient.query(saveJobInDB);
+                if(dbResultSavedJob.rowCount){
+                    return dbResultSavedJob.rows[0];
+                } else {
+                    throw Error('Transaction Failed');
+                }
+            }
+        } catch(error) {
+            if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
+
+    async deleteSavedJob(emailId,jobId) {
+        const connection = await dbSetup();
+        try{ 
+            let deleteQuery = `DELETE FROM shwift.saved_jobs WHERE email_id = '${emailId}' AND job_id = '${jobId}'`;
+            console.log(deleteQuery);
+            const dbResultDeletedJob = await connection.dbClient.query(deleteQuery);
+            if(dbResultDeletedJob.rowCount){
+                return dbResultDeletedJob.rows[0];
+            } else {
+                throw Error('Transaction Failed');
+            }
+        } catch(error) {
+            if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
 }

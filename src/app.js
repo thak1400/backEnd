@@ -249,3 +249,56 @@ export const login = async (request, response) => {
     }
         
 }
+
+export const saveJob = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const saveJobData = request.body;
+            console.log(saveJobData);
+            const result = await shwiftRepo.saveJob(saveJobData.emailId, saveJobData.jobId);
+            if(result) {
+                console.log(`Job saved successfully`);
+                response.status(200).send(result);
+            } else {
+                console.error(`Job save failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`Job save failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+    
+}
+
+export const deleteSavedJob = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const jobData = request.body;
+            console.log(jobData);
+            const result = await shwiftRepo.deleteSavedJob(jobData.emailId, jobData.jobId);
+            if(result) {
+                console.log(`Job deleted successfully`);
+                response.status(200).send(result);
+            } else {
+                console.error(`Job delete failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`Job delete failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+    
+}
+
