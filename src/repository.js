@@ -417,6 +417,50 @@ async getApplicationsByEmail(emailId) {
     }
 }
 
+async fetchAllEmployerInfo(emailId) {
+    const connection = await dbSetup();
+    try{
+        const fetchAllEmployerInfo = `SELECT * from shwift.employerinfo where recruiter_mail='${emailId}' ;`;
+        console.log(fetchAllEmployerInfo);
+        const dbfetchAllEmployerInfo = await connection.dbClient.query(fetchAllEmployerInfo);
+        if(dbfetchAllEmployerInfo.rowCount){
+            return dbfetchAllEmployerInfo.rows[0];
+        } else {
+            // throw Error('Transaction Failed');
+            return [];
+        }
+    } catch(error) {
+        if(error){
+            console.log(error.message);
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
+async updateEmployerInfo(emailId,key,value) {
+    const connection = await dbSetup();
+    try{
+        const updateEmployerInfo = `UPDATE shwift.employerinfo SET ${key}='${value}' WHERE recruiter_mail='${emailId}' returning *;`;
+        console.log(updateEmployerInfo);
+        const dbupdateEmployerInfo = await connection.dbClient.query(updateEmployerInfo);
+        if(dbupdateEmployerInfo.rowCount){
+            return dbupdateEmployerInfo.rows[0];
+        } else {
+            // throw Error('Transaction Failed');
+            return [];
+        }
+    } catch(error) {
+        if(error){
+            console.log(error.message);
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
 async getRecommendedJobs(emailId) {
     const connection = await dbSetup();
     try{
