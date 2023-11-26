@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { ShwiftRepository } from "./repository.js";
+import moment from 'moment/moment.js';
 
 export const createListing = async (request, response) => {
     try{
@@ -57,8 +58,10 @@ export const newApplication = async (request, response) => {
         if(request.body && typeof request.body === ('object')) {
             const shwiftRepo = new ShwiftRepository();
             const applicationId=uuid();
+            let currentDate = moment().format();
+            // currentDate = currentDate.toLocaleDateString() + " " + currentDate.toLocaleTimeString();
             const applicationData=request.body;
-            const result = await shwiftRepo.newApplication(applicationId,applicationData);
+            const result = await shwiftRepo.newApplication(applicationId,applicationData,currentDate);
             if(result) {
                 console.log(`newApplication successful`);
                 response.status(200).send(result);
@@ -404,6 +407,32 @@ export const fetchAllEmployeeInfo = async (request, response) => {
         }
     } catch(error) {
         console.log(`fetchAllEmployeeInfo failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+    
+}
+
+export const getSavedJobs = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const {emailId} = request.body;
+            console.log(emailId);
+            const result = await shwiftRepo.getSavedJobs(emailId);
+            if(result) {
+                console.log(`getSavedJobs successful`);
+                response.status(200).send(result);
+            } else {
+                console.error(`getSavedJobs failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`getSavedJobs failed - ${JSON.stringify(error)}`);
         response.status(500).send(error);
     }
     
