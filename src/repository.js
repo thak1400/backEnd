@@ -66,8 +66,9 @@ export class ShwiftRepository {
         const connection = await dbSetup();
         try{
             console.log(applicationId); 
-            const insertApplication = `INSERT into shwift.myapplications (email_id, application_id, app_date, application_status, job_id, resume_url)
-            values ('${applicationData.emailId}','${applicationId}','${currentDate}','${applicationData.applicationStatus}','${applicationData.jobId}','${applicationData.resumeUrl}') RETURNING *;`;
+            const insertApplication = `INSERT into shwift.myapplications (applicant_email_id, application_id, app_date, application_status, job_id, resume_url, employer_email_id)
+            values ('${applicationData.applicantEmailId}','${applicationId}','${currentDate}','${applicationData.applicationStatus}','${applicationData.jobId}','${applicationData.resumeUrl}','${applicationData.employerEmailId}') RETURNING *;`;
+            console.log(insertApplication);
             const dbResultInsertApplication = await connection.dbClient.query(insertApplication);
             if(dbResultInsertApplication.rowCount){
                 return dbResultInsertApplication.rows[0];
@@ -392,7 +393,7 @@ async getSavedJobs(emailId) {
 async getApplicationsByEmail(emailId) {
     const connection = await dbSetup();
     try{
-        const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status FROM shwift.employerlisting emp INNER JOIN shwift.myapplications apps ON emp.job_id = apps.job_id WHERE apps.email_id = '${emailId}' ;`;
+        const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status FROM shwift.employerlisting emp INNER JOIN shwift.myapplications apps ON emp.job_id = apps.job_id WHERE apps.applicant_email_id = '${emailId}' ;`;
         console.log(getApplicationsByEmail);
         const dbgetApplicationsByEmail = await connection.dbClient.query(getApplicationsByEmail);
         if(dbgetApplicationsByEmail.rowCount){
