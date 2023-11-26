@@ -62,12 +62,13 @@ export class ShwiftRepository {
         }
     }
 
-    async newApplication(applicationId, applicationData) {
+    async newApplication(applicationId, applicationData,currentDate) {
         const connection = await dbSetup();
         try{
             console.log(applicationId); 
-            const insertApplication = `INSERT into shwift.myapplications (applicant_id,application_id,job_title,org_name,app_date,application_status,job_id) 
-            values ('${applicationData.applicantID}','${applicationId}','${applicationData.jobTitle}','${applicationData.orgName}','${applicationData.applicationDate}','${applicationData.applicationStatus}','${applicationData.jobId}') RETURNING *;`;
+            const insertApplication = `INSERT into shwift.myapplications (applicant_email_id, application_id, app_date, application_status, job_id, resume_url, employer_email_id)
+            values ('${applicationData.applicantEmailId}','${applicationId}','${currentDate}','${applicationData.applicationStatus}','${applicationData.jobId}','${applicationData.resumeUrl}','${applicationData.employerEmailId}') RETURNING *;`;
+            console.log(insertApplication);
             const dbResultInsertApplication = await connection.dbClient.query(insertApplication);
             if(dbResultInsertApplication.rowCount){
                 return dbResultInsertApplication.rows[0];
@@ -361,6 +362,49 @@ async updateEmployeeInfo(emailId,key,value) {
         const dbupdateEmployeeInfo = await connection.dbClient.query(updateEmployeeInfo);
         if(dbupdateEmployeeInfo.rowCount){
             return dbupdateEmployeeInfo.rows[0];
+        } else {
+            throw Error('Transaction Failed');
+        }
+    } catch(error) {
+        if(error){
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
+async getSavedJobs(emailId) {
+    const connection = await dbSetup();
+    try{
+        const getAllSavedJobs = `SELECT emp.* FROM shwift.employerlisting emp INNER JOIN shwift.saved_jobs jobs ON emp.job_id = jobs.job_id WHERE jobs.email_id = '${emailId}';`;
+        console.log(getAllSavedJobs);
+        const dbgetAllSavedJobs = await connection.dbClient.query(getAllSavedJobs);
+        if(dbgetAllSavedJobs.rowCount){
+            dbgetAllSavedJobs.rows.forEach(element => {
+                element.job_saved = true;
+            });
+            return dbgetAllSavedJobs.rows;
+        } else {
+            throw Error('Transaction Failed');
+        }
+    } catch(error) {
+        if(error){
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
+async getApplicationsByEmail(emailId) {
+    const connection = await dbSetup();
+    try{
+        const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status FROM shwift.employerlisting emp INNER JOIN shwift.myapplications apps ON emp.job_id = apps.job_id WHERE apps.applicant_email_id = '${emailId}' ;`;
+        console.log(getApplicationsByEmail);
+        const dbgetApplicationsByEmail = await connection.dbClient.query(getApplicationsByEmail);
+        if(dbgetApplicationsByEmail.rowCount){
+            return dbgetApplicationsByEmail.rows;
         } else {
             throw Error('Transaction Failed');
         }
