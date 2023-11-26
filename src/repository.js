@@ -468,6 +468,7 @@ async fetchAllApplicationsForSpecificEmployer(emailId) {
         console.log(fetchAllApplicationsForSpecificEmployer);
         const dbfetchAllApplicationsForSpecificEmployer = await connection.dbClient.query(fetchAllApplicationsForSpecificEmployer);
         if(dbfetchAllApplicationsForSpecificEmployer.rowCount){
+
             return dbfetchAllApplicationsForSpecificEmployer.rows[0];
         } else {
             // throw Error('Transaction Failed');
@@ -476,6 +477,47 @@ async fetchAllApplicationsForSpecificEmployer(emailId) {
     } catch(error) {
         if(error){
             console.log(error.message);
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
+async getRecommendedJobs(emailId) {
+    const connection = await dbSetup();
+    try{
+        const getUserSkills = `SELECT emp_skills FROM shwift.employeeinfo WHERE employee_id = '${emailId}'`;
+        console.log(getUserSkills);
+        const dbgetUserSkills = await connection.dbClient.query(getUserSkills);
+        var recommendedJobs = [];
+        if(dbgetUserSkills.rowCount){
+            const userSkills = dbgetUserSkills.rows[0].emp_skills;
+            let userSkillsList = userSkills.split(",");
+            userSkillsList = userSkillsList.toLocaleString().toLowerCase().split(',');
+            const getAllListings = `SELECT * FROM shwift.employerlisting;`;
+            const dbGetAllListings = await connection.dbClient.query(getAllListings);
+            if(dbGetAllListings.rowCount){
+                dbGetAllListings.rows.forEach(element => {
+                    const reqSkills = element.job_req;
+                    console.log(reqSkills);
+                    let skillsList = reqSkills.split(",");
+                    skillsList = skillsList.toLocaleString().toLowerCase().split(',');
+                    skillsList.forEach(e => {
+                        if (userSkillsList.indexOf(e) !== -1) {
+                            recommendedJobs.push(element);
+                        }
+                    });
+                }); 
+                return recommendedJobs;
+            } else {
+               return recommendedJobs;
+            }
+        } else {
+            return recommendedJobs;
+        }
+    } catch(error) {
+        if(error){
             throw new Error(error.message);
         }
     } finally {
