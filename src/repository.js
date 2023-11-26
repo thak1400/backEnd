@@ -309,8 +309,8 @@ async signUp(serialNum,userData) {
             
             if(dbResultNewAccount.rows[0].acc_type.toLowerCase()==="employee")
             {
-                const signUpInfo=`INSERT into shwift.employeeinfo (first_name,last_name,employee_id,curr_employment_status,employee_gender,employee_dob,emp_expertise,rating,employee_dp,curr_position,emp_summary,emp_projects,emp_skills,emp_workex,emp_education,serial_num)
-                values ('${dbResultNewAccount.rows[0].first_name}','${dbResultNewAccount.rows[0].last_name}','${dbResultNewAccount.rows[0].email_id}','','','','',0,'','','','','','','','${serialNum}') RETURNING *;`;
+                const signUpInfo=`INSERT into shwift.employeeinfo (first_name,last_name,employee_id,curr_employment_status,employee_gender,employee_dob,emp_expertise,rating,employee_dp,curr_position,emp_summary,emp_projects,emp_skills,emp_workex,emp_education,serial_num,emp_availability)
+                values ('${dbResultNewAccount.rows[0].first_name}','${dbResultNewAccount.rows[0].last_name}','${dbResultNewAccount.rows[0].email_id}','','','','',0,'','','','','','','','${serialNum}','${dbResultNewAccount.rows[0].empAvailability}') RETURNING *;`;
                 console.log(signUpInfo);
                 const dbsignUpInfo=await connection.dbClient.query(signUpInfo);
             }
@@ -410,6 +410,28 @@ async getApplicationsByEmail(emailId) {
         }
     } catch(error) {
         if(error){
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
+async fetchAllEmployerInfo(emailId) {
+    const connection = await dbSetup();
+    try{
+        const fetchAllEmployerInfo = `SELECT * from shwift.employerinfo where recruiter_mail='${emailId}' ;`;
+        console.log(fetchAllEmployerInfo);
+        const dbfetchAllEmployerInfo = await connection.dbClient.query(fetchAllEmployerInfo);
+        if(dbfetchAllEmployerInfo.rowCount){
+            return dbfetchAllEmployerInfo.rows[0];
+        } else {
+            // throw Error('Transaction Failed');
+            return [];
+        }
+    } catch(error) {
+        if(error){
+            console.log(error.message);
             throw new Error(error.message);
         }
     } finally {
