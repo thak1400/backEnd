@@ -550,3 +550,29 @@ export const updateEmployerInfo = async (request, response) => {
     
 }
 
+export const fetchAllApplicationsForSpecificEmployer = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const {emailId} = request.body;
+            console.log(emailId);
+            const result = await shwiftRepo.fetchAllApplicationsForSpecificEmployer(emailId);
+            if(result) {
+                console.log(`fetchAllApplicationsForSpecificEmployer successfully`);
+                response.status(200).send(result);
+            } else {
+                console.error(`fetchAllApplicationsForSpecificEmployer failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`fetchAllApplicationsForSpecificEmployer failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+    
+}
+

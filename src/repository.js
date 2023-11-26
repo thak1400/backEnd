@@ -461,6 +461,28 @@ async updateEmployerInfo(emailId,key,value) {
     }
 }
 
+async fetchAllApplicationsForSpecificEmployer(emailId) {
+    const connection = await dbSetup();
+    try{
+        const fetchAllApplicationsForSpecificEmployer = `SELECT * from shwift.myapplications where employer_email_id='${emailId}' ;`;
+        console.log(fetchAllApplicationsForSpecificEmployer);
+        const dbfetchAllApplicationsForSpecificEmployer = await connection.dbClient.query(fetchAllApplicationsForSpecificEmployer);
+        if(dbfetchAllApplicationsForSpecificEmployer.rowCount){
+            return dbfetchAllApplicationsForSpecificEmployer.rows[0];
+        } else {
+            // throw Error('Transaction Failed');
+            return [];
+        }
+    } catch(error) {
+        if(error){
+            console.log(error.message);
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
 }
 
 
