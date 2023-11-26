@@ -4,8 +4,8 @@ export class ShwiftRepository {
     async addListing(jobId, listingData) {
         const connection = await dbSetup();
         try{
-            const insertListing = `INSERT into shwift.employerlisting (job_id, job_title, job_desc, job_req, job_priority, pay_scale, num_hours, job_location, position_type, position_start_date, application_deadline, recruiter_name, job_saved,position_onsite) 
-                                VALUES ('${jobId}', '${listingData.jobTitle}', '${listingData.jobDescription}', '${listingData.jobRequirement}', '${listingData.jobPriority}', '${listingData.payScale}', '${listingData.numHours}', '${listingData.jobLocation}', '${listingData.positionType}', '${listingData.startDate}', '${listingData.appDeadline}', '${listingData.recruiterName}','false','${listingData.positionOnsite}') returning *;`;
+            const insertListing = `INSERT into shwift.employerlisting (job_id, job_title, job_desc, job_req, job_priority, pay_scale, num_hours, job_location, position_type, position_start_date, application_deadline, recruiter_name, job_saved,position_onsite,recruiter_email_id) 
+                                VALUES ('${jobId}', '${listingData.jobTitle}', '${listingData.jobDescription}', '${listingData.jobRequirement}', '${listingData.jobPriority}', '${listingData.payScale}', '${listingData.numHours}', '${listingData.jobLocation}', '${listingData.positionType}', '${listingData.startDate}', '${listingData.appDeadline}', '${listingData.recruiterName}','false','${listingData.positionOnsite}','${listingData.recruiterEmail}') returning *;`;
                                 console.log(insertListing);
             const dbResultInsertListing = await connection.dbClient.query(insertListing);
             // console.log(insertListing);
@@ -298,7 +298,7 @@ export class ShwiftRepository {
     }
 }
 
-async signUp(userData) {
+async signUp(serialNum,userData) {
     const connection = await dbSetup();
     try{
         const signUp = `INSERT into shwift.userinfo (first_name,last_name,email_id,pswd,acc_type,phone_num) 
@@ -308,8 +308,15 @@ async signUp(userData) {
             
             if(dbResultNewAccount.rows[0].acc_type.toLowerCase()==="employee")
             {
-                const signUpInfo=`INSERT into shwift.employeeinfo (first_name,last_name,employee_id,curr_employment_status,employee_gender,employee_dob,emp_expertise,rating,employee_dp,curr_position,emp_summary,emp_projects,emp_skills,emp_workex,emp_education)
-                values ('${dbResultNewAccount.rows[0].first_name}','${dbResultNewAccount.rows[0].last_name}','${dbResultNewAccount.rows[0].email_id}','','','','',0,'','','','','','','') RETURNING *;`;
+                const signUpInfo=`INSERT into shwift.employeeinfo (first_name,last_name,employee_id,curr_employment_status,employee_gender,employee_dob,emp_expertise,rating,employee_dp,curr_position,emp_summary,emp_projects,emp_skills,emp_workex,emp_education,serial_num)
+                values ('${dbResultNewAccount.rows[0].first_name}','${dbResultNewAccount.rows[0].last_name}','${dbResultNewAccount.rows[0].email_id}','','','','',0,'','','','','','','','${serialNum}') RETURNING *;`;
+                console.log(signUpInfo);
+                const dbsignUpInfo=await connection.dbClient.query(signUpInfo);
+            }
+            else
+            {
+                const signUpInfo=`INSERT into shwift.employerinfo (first_name,last_name,employee_id,curr_employment_status,employee_gender,employee_dob,emp_expertise,rating,employee_dp,curr_position,emp_summary,emp_projects,emp_skills,emp_workex,emp_education,serial_num)
+                values ('${dbResultNewAccount.rows[0].first_name}','${dbResultNewAccount.rows[0].last_name}','${dbResultNewAccount.rows[0].email_id}','','','','',0,'','','','','','','','${serialNum}') RETURNING *;`;
                 console.log(signUpInfo);
                 const dbsignUpInfo=await connection.dbClient.query(signUpInfo);
             }

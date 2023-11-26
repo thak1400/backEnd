@@ -22,6 +22,7 @@ app.post('/shwift/createlisting', createListing);
 
 app.get('/shwift/listing', getListing);
 
+// Not in use
 app.get('/shwift/application/:orgName', getApplications);
 
 app.delete('/shwift/deleteListing', deleteListing);

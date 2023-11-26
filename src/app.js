@@ -199,8 +199,9 @@ export const signUp = async (request, response) => {
         if(request.body && typeof request.body === ('object')) {
             const shwiftRepo = new ShwiftRepository();
             const userData=request.body;
+            const serialNum=uuid();
             console.log(userData);
-            const result = await shwiftRepo.signUp(userData);
+            const result = await shwiftRepo.signUp(serialNum,userData);
             if(result) {
                 console.log(`signUp successful`);
                 response.status(200).send(result);
