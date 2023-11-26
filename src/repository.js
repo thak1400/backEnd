@@ -389,6 +389,26 @@ async getSavedJobs(emailId) {
     }
 }
 
+async getApplicationsByEmail(emailId) {
+    const connection = await dbSetup();
+    try{
+        const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status FROM shwift.employerlisting emp INNER JOIN shwift.myapplications apps ON emp.job_id = apps.job_id WHERE apps.email_id = '${emailId}' ;`;
+        console.log(getApplicationsByEmail);
+        const dbgetApplicationsByEmail = await connection.dbClient.query(getApplicationsByEmail);
+        if(dbgetApplicationsByEmail.rowCount){
+            return dbgetApplicationsByEmail.rows;
+        } else {
+            throw Error('Transaction Failed');
+        }
+    } catch(error) {
+        if(error){
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
 }
 
 
