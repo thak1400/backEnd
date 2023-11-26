@@ -439,6 +439,28 @@ async fetchAllEmployerInfo(emailId) {
     }
 }
 
+async updateEmployerInfo(emailId,key,value) {
+    const connection = await dbSetup();
+    try{
+        const updateEmployerInfo = `UPDATE shwift.employerinfo SET ${key}='${value}' WHERE recruiter_mail='${emailId}' returning *;`;
+        console.log(updateEmployerInfo);
+        const dbupdateEmployerInfo = await connection.dbClient.query(updateEmployerInfo);
+        if(dbupdateEmployerInfo.rowCount){
+            return dbupdateEmployerInfo.rows[0];
+        } else {
+            // throw Error('Transaction Failed');
+            return [];
+        }
+    } catch(error) {
+        if(error){
+            console.log(error.message);
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
 }
 
 
