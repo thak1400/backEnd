@@ -655,7 +655,7 @@ export const uploadPdf = async (request, response) => {
             const shwiftRepo = new ShwiftRepository();
             const {base64Pdf} = request.body;
             const applicantId = uuid();
-            const result = await shwiftRepo.uploadImage(applicantId, base64Pdf);
+            const result = await shwiftRepo.uploadPdf(applicantId, base64Pdf);
             if(result) {
                 console.log(`uploadPdf successful`);
                 response.status(200).send(result);
