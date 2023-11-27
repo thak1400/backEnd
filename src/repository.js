@@ -68,6 +68,26 @@ export class ShwiftRepository {
         }
     }
 
+    async fetchListingByEmployerEmail(emailId) {
+        const connection = await dbSetup();
+        try{
+            const getListing = `SELECT * FROM shwift.employerlisting where recruiter_email_id = '${emailId}';`;
+            const dbResultGetListing = await connection.dbClient.query(getListing);
+            if(dbResultGetListing.rowCount){
+                return dbResultGetListing.rows;
+            } else {
+                return []
+            }
+        } catch(error) {
+            if(error){
+                console.log(error.message);
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
+
     async newApplication(applicationId, applicationData,currentDate) {
         const connection = await dbSetup();
         try{

@@ -100,6 +100,28 @@ export const getListing = async (request, response) => {
     }
 }
 
+export const getListingByEmail = async (request, response) => {
+    try{
+        const shwiftRepo = new ShwiftRepository();
+        const {emailId} = request.params;
+        const result = await shwiftRepo.fetchListingByEmployerEmail(emailId);
+        if(result) {
+            console.log(`getListingByEmail successful`);
+            response.status(200).send(result);
+        } else {
+            console.error(`getListingByEmail Failed  - ${JSON.stringify(request.param)}`);
+            response.status(400).send({
+                type: 'BAD_REQUEST',
+                message: 'Request failed before completion',
+                details: 'Invalid Input request'
+            });
+        }
+    } catch(error) {
+        console.log(`getListingByEmail failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+}
+
 export const updateApplication = async (request, response) => {
     try{
         if(request.body && typeof request.body === ('object')) {
