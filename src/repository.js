@@ -520,7 +520,7 @@ async updateEmployerInfo(emailId,key,value) {
 async fetchAllApplicationsForSpecificEmployer(emailId) {
     const connection = await dbSetup();
     try{
-        const fetchAllApplicationsForSpecificEmployer = `SELECT u.first_name, u.last_name, u.email_id, u.phone_num, emp.employee_dp, job.job_title, emp.availability, job.job_id 
+        const fetchAllApplicationsForSpecificEmployer = `SELECT u.first_name, u.last_name, u.email_id, u.phone_num, emp.employee_dp, job.job_title, emp.availability, job.job_id, apps.resume_url
         from shwift.myapplications apps, shwift.userinfo u, shwift.employerlisting job, shwift.employeeinfo emp 
         where apps.employer_email_id ='${emailId}' AND apps.applicant_email_id = u.email_id AND apps.job_id = job.job_id AND u.email_id = emp.employee_id ;`;
         console.log(fetchAllApplicationsForSpecificEmployer);
