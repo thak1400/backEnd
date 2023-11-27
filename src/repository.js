@@ -138,7 +138,7 @@ export class ShwiftRepository {
     async fetchApplication(orgName, jobId) {
         const connection = await dbSetup();
         try{
-            let getApp = `SELECT * FROM shwift.myapplications where org_name = '${orgName}'`;
+            let getApp = `SELECT app.*, emp.employee_dp FROM shwift.myapplications app Inner Join shwift.employeeinfo emp ON app.applicant_email_id = emp.employee_id where org_name = '${orgName}'`;
             if(jobId) {
                 getApp += ` and job_id = '${jobId}'`;
             }
@@ -211,9 +211,20 @@ export class ShwiftRepository {
             console.log(login);
             const dbResultLogin = await connection.dbClient.query(login);
             if(dbResultLogin.rowCount){
-                return dbResultLogin.rows[0];
+                let res = dbResultLogin.rows[0];
+                let infoQuery = ``;
+                if(res.acc_type == "employer"){
+                    infoQuery = `Select employer_dp as user_dp from shwift.employerinfo where recruiter_mail = '${emailId}';`;
+                } else {
+                    infoQuery = `Select employee_dp as user_dp from shwift.employeeinfo where employee_id = '${emailId}';`;
+                }
+                const dbResultDp = await connection.dbClient.query(infoQuery);
+                if(dbResultDp.rowCount) {
+                    res.user_dp = dbResultDp.rows[0].user_dp;
+                }
+                return res;
             } else {
-                throw Error('Transaction Failed');
+                throw Error('No such User Exists.');
             }
         } catch(error) {
             if(error){
