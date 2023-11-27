@@ -138,7 +138,7 @@ export class ShwiftRepository {
     async fetchApplication(orgName, jobId) {
         const connection = await dbSetup();
         try{
-            let getApp = `SELECT * FROM shwift.myapplications where org_name = '${orgName}'`;
+            let getApp = `SELECT app.*, emp.employee_dp FROM shwift.myapplications app Inner Join shwift.employeeinfo emp ON app.applicant_email_id = emp.employee_id where org_name = '${orgName}'`;
             if(jobId) {
                 getApp += ` and job_id = '${jobId}'`;
             }
@@ -211,9 +211,20 @@ export class ShwiftRepository {
             console.log(login);
             const dbResultLogin = await connection.dbClient.query(login);
             if(dbResultLogin.rowCount){
-                return dbResultLogin.rows[0];
+                let res = dbResultLogin.rows[0];
+                let infoQuery = ``;
+                if(res.acc_type == "employer"){
+                    infoQuery = `Select employer_dp as user_dp from shwift.employerinfo where recruiter_mail = '${emailId}';`;
+                } else {
+                    infoQuery = `Select employee_dp as user_dp from shwift.employeeinfo where employee_id = '${emailId}';`;
+                }
+                const dbResultDp = await connection.dbClient.query(infoQuery);
+                if(dbResultDp.rowCount) {
+                    res.user_dp = dbResultDp.rows[0].user_dp;
+                }
+                return res;
             } else {
-                throw Error('Transaction Failed');
+                throw Error('No such User Exists.');
             }
         } catch(error) {
             if(error){
@@ -353,7 +364,7 @@ async signUp(serialNum,userData) {
             if(dbResultNewAccount.rows[0].acc_type.toLowerCase()==="employee")
             {
                 const signUpInfo=`INSERT into shwift.employeeinfo (first_name,last_name,employee_id,curr_employment_status,employee_gender,employee_dob,emp_expertise,rating,employee_dp,curr_position,emp_summary,emp_projects,emp_skills,emp_workex,emp_education,serial_num, availability)
-                values ('${dbResultNewAccount.rows[0].first_name}','${dbResultNewAccount.rows[0].last_name}','${dbResultNewAccount.rows[0].email_id}','','','','',0,'${userData.profileDp}','','','','','','','${serialNum}','') RETURNING *;`;
+                values ('${dbResultNewAccount.rows[0].first_name}','${dbResultNewAccount.rows[0].last_name}','${dbResultNewAccount.rows[0].email_id}','','','','',0,'${userData.profileDp}','','','','','','','${serialNum}','${userData.availability}') RETURNING *;`;
                 console.log(signUpInfo);
                 const dbsignUpInfo=await connection.dbClient.query(signUpInfo);
             }
@@ -507,7 +518,7 @@ async updateEmployerInfo(emailId,key,value) {
 async fetchAllApplicationsForSpecificEmployer(emailId) {
     const connection = await dbSetup();
     try{
-        const fetchAllApplicationsForSpecificEmployer = `SELECT u.first_name, u.last_name, u.email_id, u.phone_num, emp.employee_dp, job.job_title 
+        const fetchAllApplicationsForSpecificEmployer = `SELECT u.first_name, u.last_name, u.email_id, u.phone_num, emp.employee_dp, job.job_title, emp.availability, job.job_id 
         from shwift.myapplications apps, shwift.userinfo u, shwift.employerlisting job, shwift.employeeinfo emp 
         where apps.employer_email_id ='${emailId}' AND apps.applicant_email_id = u.email_id AND apps.job_id = job.job_id AND u.email_id = emp.employee_id ;`;
         console.log(fetchAllApplicationsForSpecificEmployer);
@@ -585,7 +596,7 @@ async uploadImage(applicantId, base64Data) {
         const s3 = new AWS.S3();
         const imgData = await s3.upload(params).promise();
         setTimeout( () => {}, 1000);
-        return { profileDp: imgData.Location};
+        return imgData.Location;
     } catch(error) {
         console.log(error);
         if(error){
