@@ -268,22 +268,35 @@ export class ShwiftRepository {
         const fetchSpecificListing = `SELECT * FROM shwift.employerlisting;`;
         const dbGetAllListings = await connection.dbClient.query(fetchSpecificListing);
         if(dbGetAllListings.rowCount){
-            
             for(let i=0;i<dbGetAllListings.rowCount;i++)
             {
                 const currJobId=dbGetAllListings.rows[i].job_id;
-                console.log(currJobId);
-                const fetchFromSavedJobsTbl=`SELECT * FROM shwift.saved_jobs where email_id='${emailId}' and job_id='${currJobId}' `;
-                console.log(fetchFromSavedJobsTbl);
+                // console.log(currJobId);
+                const fetchFromSavedJobsTbl=`SELECT * FROM shwift.saved_jobs where email_id='${emailId}' and job_id='${currJobId}'; `;
+                // console.log(fetchFromSavedJobsTbl);
                 const dbfetchFromSavedJobsTbl = await connection.dbClient.query(fetchFromSavedJobsTbl);
-                console.log(dbfetchFromSavedJobsTbl.rowCount);
+                // console.log(dbfetchFromSavedJobsTbl.rowCount);
                 if(dbfetchFromSavedJobsTbl.rowCount)
-                {
+                {   
                     dbGetAllListings.rows[i].job_saved=true;
                 }
                 else{
                     dbGetAllListings.rows[i].job_saved=false;
                 }
+            }
+            for(let j=0;j<dbGetAllListings.rowCount;j++)
+            {
+                const currRecruiter=dbGetAllListings.rows[j].recruiter_email_id;
+                // console.log(currRecruiter);
+                const fetchFromEmployerInfoTbl=`SELECT * FROM shwift.employerinfo where recruiter_mail='${currRecruiter}'; `;
+                // console.log(fetchFromEmployerInfoTbl);
+                const dbfetchFromEmployerInfoTbl = await connection.dbClient.query(fetchFromEmployerInfoTbl);
+                if(dbfetchFromEmployerInfoTbl.rowCount)
+                {
+                    // console.log(dbfetchFromEmployerInfoTbl.rows[j].org_name);
+                    dbGetAllListings.rows[j].recruiter_name = dbfetchFromEmployerInfoTbl.rows[0].org_name;                    
+                }
+                // console.log(dbfetchFromEmployerInfoTbl.rows[j]);
             }
             // console.log(dbResultGetSpecificListing.rows);    
             return dbGetAllListings.rows;
