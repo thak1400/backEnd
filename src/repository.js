@@ -584,7 +584,7 @@ async uploadImage(applicantId, base64Data) {
         const s3 = new AWS.S3();
         const imgData = await s3.upload(params).promise();
         setTimeout( () => {}, 1000);
-        return { profileDp: imgData.Location};
+        return imgData.Location;
     } catch(error) {
         console.log(error);
         if(error){
