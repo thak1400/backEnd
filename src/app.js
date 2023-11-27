@@ -648,3 +648,31 @@ export const uploadImage = async (request, response) => {
     }
     
 }
+
+export const updateApplicationStatus = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const recruiter_emailId = request.body.recruiter_emailId;
+            const employee_emailId = request.body.employee_emailId;
+            const jobId = request.body.jobId;
+            const appStatus = request.body.appStatus;
+            const result = await shwiftRepo.updateApplicationStatus(recruiter_emailId,employee_emailId,jobId,appStatus);
+            if(result) {
+                console.log(`updateApplicationStatus successfully`);
+                response.status(200).send(result);
+            } else {
+                console.error(`updateApplicationStatus failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`updateApplicationStatus failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+    
+}

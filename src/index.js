@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 //   cb(null,true);
 // }
 // });
-import { uploadImage, createListing, deleteListing, newApplication, updateApplication, getApplications, getListing, updateListing, signUp, updatePswd, login, saveJob, deleteSavedJob, fetchSavedJobs, fetchSpecificListing, fetchAllEmployeeInfo, updateEmployeeInfo, getSavedJobs, getApplicationsByEmail, fetchAllEmployerInfo, updateEmployerInfo, getRecommendedJobs, fetchAllApplicationsForSpecificEmployer, getListingByEmail } from './app.js';
+import { uploadImage, createListing, deleteListing, newApplication, updateApplication, getApplications, getListing, updateListing, signUp, updatePswd, login, saveJob, deleteSavedJob, fetchSavedJobs, fetchSpecificListing, fetchAllEmployeeInfo, updateEmployeeInfo, getSavedJobs, getApplicationsByEmail, fetchAllEmployerInfo, updateEmployerInfo, getRecommendedJobs, fetchAllApplicationsForSpecificEmployer, getListingByEmail, updateApplicationStatus } from './app.js';
 dotenv.config();
 const app = express();
 app.use(bodyParser.json({ limit: '5mb' }))
@@ -73,6 +73,8 @@ app.post('/shwift/getRecommendedJobs', getRecommendedJobs);
 app.post('/shwift/fetchAllApplicationsForSpecificEmployer', fetchAllApplicationsForSpecificEmployer);
 
 app.post('/shwift/uploadImage', uploadImage);
+
+app.post('/shwift/updateApplicationStatus', updateApplicationStatus);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

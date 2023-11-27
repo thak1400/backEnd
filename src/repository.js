@@ -596,6 +596,27 @@ async uploadImage(applicantId, base64Data) {
     }
 }
 
+async updateApplicationStatus(recruiter_emailId,employee_emailId,jobId,appStatus) {
+    const connection = await dbSetup();
+    try{
+        const updateApplicationStatus = `UPDATE shwift.myapplications SET application_status='${appStatus}' WHERE applicant_email_id='${employee_emailId}' and employer_email_id='${recruiter_emailId}' and job_id='${jobId}' returning *;`;
+        console.log(updateApplicationStatus);
+        const dbupdateApplicationStatus = await connection.dbClient.query(updateApplicationStatus);
+        if(dbupdateApplicationStatus.rowCount){
+            return dbupdateApplicationStatus.rows[0];
+        } else {
+            return [];
+        }
+    } catch(error) {
+        if(error){
+            console.log(error.message);
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
 }
 
 
