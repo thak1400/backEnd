@@ -54,7 +54,7 @@ export class ShwiftRepository {
     async fetchListing() {
         const connection = await dbSetup();
         try{
-            const getListing = `SELECT * FROM shwift.employerlisting;`;
+            const getListing = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist INNER JOIN shwift.employerinfo empinfo on emplist.recruiter_email_id=empinfo.recruiter_mail;`;
             const dbResultGetListing = await connection.dbClient.query(getListing);
             if(dbResultGetListing.rowCount){
                 return dbResultGetListing.rows;
@@ -228,6 +228,7 @@ export class ShwiftRepository {
         const connection = await dbSetup();
         try{
             const check = `SELECT * FROM shwift.saved_jobs WHERE email_id = '${emailId}' AND job_id = '${jobId}';`;
+            console.log(check);
             const dbResultCheckSaved = await connection.dbClient.query(check);
             if(dbResultCheckSaved.rowCount){
                 throw Error('Transaction Failed');
@@ -273,7 +274,7 @@ export class ShwiftRepository {
     async fetchSavedJobs(emailId,jobId) {
         const connection = await dbSetup();
         try{ 
-            let fetchSavedJobs = `SELECT * FROM shwift.saved_jobs where email_id='${emailId}' and job_id='${jobId}' `;
+            let fetchSavedJobs = `SELECT savedjobs.*,empinfo.employer_dp FROM shwift.saved_jobs savedjobs INNER JOIN shwift.employerinfo empinfo on savedjobs.email_id=empinfo.recruiter_mail where email_id='${emailId}' and job_id='${jobId}' `;
             console.log(emailId);
             console.log(fetchSavedJobs);
             const dbfetchSavedJobs = await connection.dbClient.query(fetchSavedJobs);
@@ -294,7 +295,7 @@ export class ShwiftRepository {
     async fetchSpecificListing(emailId) {
     const connection = await dbSetup();
     try{
-        const fetchSpecificListing = `SELECT * FROM shwift.employerlisting;`;
+        const fetchSpecificListing = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist INNER JOIN shwift.employerinfo empinfo on emplist.recruiter_email_id=empinfo.recruiter_mail;`;
         const dbGetAllListings = await connection.dbClient.query(fetchSpecificListing);
         if(dbGetAllListings.rowCount){
             for(let i=0;i<dbGetAllListings.rowCount;i++)
