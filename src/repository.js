@@ -456,7 +456,7 @@ async getApplicationsByEmail(emailId) {
     const connection = await dbSetup();
     try{
         // const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status FROM shwift.employerlisting emp INNER JOIN shwift.myapplications apps ON emp.job_id = apps.job_id WHERE apps.applicant_email_id = '${emailId}' ;`;
-        const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status FROM shwift.employerlisting emp, shwift.myapplications apps, shwift.employerinfo info WHERE apps.applicant_email_id = '${emailId}' AND emp.job_id = apps.job_id AND emp.recruiter_email_id = info.recruiter_mail;`;
+        const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status, info.employer_dp FROM shwift.employerlisting emp, shwift.myapplications apps, shwift.employerinfo info WHERE apps.applicant_email_id = '${emailId}' AND emp.job_id = apps.job_id AND emp.recruiter_email_id = info.recruiter_mail;`;
         console.log(getApplicationsByEmail);
         const dbgetApplicationsByEmail = await connection.dbClient.query(getApplicationsByEmail);
         if(dbgetApplicationsByEmail.rowCount){
