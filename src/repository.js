@@ -73,7 +73,8 @@ export class ShwiftRepository {
     async fetchListingByEmployerEmail(emailId) {
         const connection = await dbSetup();
         try{
-            const getListing = `SELECT * FROM shwift.employerlisting where recruiter_email_id = '${emailId}';`;
+            const getListing = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist Inner Join shwift.employerinfo empinfo ON emplist.recruiter_email_id = empinfo.recruiter_mail where recruiter_email_id = '${emailId}';`;
+            console.log(getListing);
             const dbResultGetListing = await connection.dbClient.query(getListing);
             if(dbResultGetListing.rowCount){
                 return dbResultGetListing.rows;
@@ -537,7 +538,7 @@ async getRecommendedJobs(emailId) {
             const userSkills = dbgetUserSkills.rows[0].emp_skills;
             let userSkillsList = userSkills.split(",");
             userSkillsList = userSkillsList.toLocaleString().toLowerCase().split(',');
-            const getAllListings = `SELECT * FROM shwift.employerlisting;`;
+            const getAllListings = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist Inner Join shwift.employerinfo empinfo ON emplist.recruiter_email_id = empinfo.recruiter_mail;`;
             const dbGetAllListings = await connection.dbClient.query(getAllListings);
             if(dbGetAllListings.rowCount){
                 dbGetAllListings.rows.forEach(element => {
