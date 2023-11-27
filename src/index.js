@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 //   cb(null,true);
 // }
 // });
-import { createListing, deleteListing, newApplication, updateApplication, getApplications, getListing, updateListing, signUp, updatePswd, login, saveJob, deleteSavedJob, fetchSavedJobs, fetchSpecificListing, fetchAllEmployeeInfo, updateEmployeeInfo, getSavedJobs, getApplicationsByEmail, fetchAllEmployerInfo, updateEmployerInfo, getRecommendedJobs, fetchAllApplicationsForSpecificEmployer, uploadImage } from './app.js';
+import { createListing, deleteListing, newApplication, updateApplication, getApplications, getListing, updateListing, signUp, updatePswd, login, saveJob, deleteSavedJob, fetchSavedJobs, fetchSpecificListing, fetchAllEmployeeInfo, updateEmployeeInfo, getSavedJobs, getApplicationsByEmail, fetchAllEmployerInfo, updateEmployerInfo, getRecommendedJobs, fetchAllApplicationsForSpecificEmployer } from './app.js';
 dotenv.config();
 const app = express();
 app.use(bodyParser.json())
