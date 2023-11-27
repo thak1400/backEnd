@@ -57,7 +57,7 @@ export class ShwiftRepository {
     async fetchListing() {
         const connection = await dbSetup();
         try{
-            const getListing = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist INNER JOIN shwift.employerinfo empinfo on emplist.recruiter_email_id=empinfo.recruiter_mail ORDER BY emplist.created_by DESC;`;
+            const getListing = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist INNER JOIN shwift.employerinfo empinfo on emplist.recruiter_email_id=empinfo.recruiter_mail ORDER BY emplist.created_at DESC;`;
             const dbResultGetListing = await connection.dbClient.query(getListing);
             if(dbResultGetListing.rowCount){
                 return dbResultGetListing.rows;
@@ -76,7 +76,7 @@ export class ShwiftRepository {
     async fetchListingByEmployerEmail(emailId) {
         const connection = await dbSetup();
         try{
-            const getListing = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist Inner Join shwift.employerinfo empinfo ON emplist.recruiter_email_id = empinfo.recruiter_mail where recruiter_email_id = '${emailId}' ORDER BY emplist.created_by DESC;`;
+            const getListing = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist Inner Join shwift.employerinfo empinfo ON emplist.recruiter_email_id = empinfo.recruiter_mail where recruiter_email_id = '${emailId}' ORDER BY emplist.created_at DESC;`;
             console.log(getListing);
             const dbResultGetListing = await connection.dbClient.query(getListing);
             if(dbResultGetListing.rowCount){
@@ -309,7 +309,7 @@ export class ShwiftRepository {
     async fetchSpecificListing(emailId) {
     const connection = await dbSetup();
     try{
-        const fetchSpecificListing = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist INNER JOIN shwift.employerinfo empinfo on emplist.recruiter_email_id=empinfo.recruiter_mail ORDER BY emplist.created_by DESC;`;
+        const fetchSpecificListing = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist INNER JOIN shwift.employerinfo empinfo on emplist.recruiter_email_id=empinfo.recruiter_mail ORDER BY emplist.created_at DESC;`;
         const dbGetAllListings = await connection.dbClient.query(fetchSpecificListing);
         if(dbGetAllListings.rowCount){
             for(let i=0;i<dbGetAllListings.rowCount;i++)
@@ -435,7 +435,7 @@ async getSavedJobs(emailId) {
     const connection = await dbSetup();
     try{
         // const getAllSavedJobs = `SELECT emp.* FROM shwift.employerlisting emp INNER JOIN shwift.saved_jobs jobs ON emp.job_id = jobs.job_id WHERE jobs.email_id = '${emailId}';`;
-        const getAllSavedJobs = `SELECT emp.*, info.employer_dp FROM shwift.employerlisting emp, shwift.saved_jobs jobs, shwift.employerinfo info WHERE jobs.email_id = '${emailId}' AND emp.job_id = jobs.job_id AND emp.recruiter_email_id = info.recruiter_mail ORDER BY emp.created_by DESC;`;
+        const getAllSavedJobs = `SELECT emp.*, info.employer_dp FROM shwift.employerlisting emp, shwift.saved_jobs jobs, shwift.employerinfo info WHERE jobs.email_id = '${emailId}' AND emp.job_id = jobs.job_id AND emp.recruiter_email_id = info.recruiter_mail ORDER BY emp.created_at DESC;`;
         console.log(getAllSavedJobs);
         const dbgetAllSavedJobs = await connection.dbClient.query(getAllSavedJobs);
         if(dbgetAllSavedJobs.rowCount){
@@ -459,7 +459,7 @@ async getApplicationsByEmail(emailId) {
     const connection = await dbSetup();
     try{
         // const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status FROM shwift.employerlisting emp INNER JOIN shwift.myapplications apps ON emp.job_id = apps.job_id WHERE apps.applicant_email_id = '${emailId}' ;`;
-        const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status, info.employer_dp FROM shwift.employerlisting emp, shwift.myapplications apps, shwift.employerinfo info WHERE apps.applicant_email_id = '${emailId}' AND emp.job_id = apps.job_id AND emp.recruiter_email_id = info.recruiter_mail ORDER BY emp.created_by DESC;`;
+        const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status, info.employer_dp FROM shwift.employerlisting emp, shwift.myapplications apps, shwift.employerinfo info WHERE apps.applicant_email_id = '${emailId}' AND emp.job_id = apps.job_id AND emp.recruiter_email_id = info.recruiter_mail ORDER BY emp.created_at DESC;`;
         console.log(getApplicationsByEmail);
         const dbgetApplicationsByEmail = await connection.dbClient.query(getApplicationsByEmail);
         if(dbgetApplicationsByEmail.rowCount){
@@ -525,7 +525,7 @@ async fetchAllApplicationsForSpecificEmployer(emailId) {
     try{
         const fetchAllApplicationsForSpecificEmployer = `SELECT u.first_name, u.last_name, u.email_id, u.phone_num, emp.employee_dp, job.job_title, emp.availability, job.job_id, apps.resume_url
         from shwift.myapplications apps, shwift.userinfo u, shwift.employerlisting job, shwift.employeeinfo emp 
-        where apps.employer_email_id ='${emailId}' AND apps.applicant_email_id = u.email_id AND apps.job_id = job.job_id AND u.email_id = emp.employee_id ORDER BY job.created_by DESC;`;
+        where apps.employer_email_id ='${emailId}' AND apps.applicant_email_id = u.email_id AND apps.job_id = job.job_id AND u.email_id = emp.employee_id ORDER BY job.created_at DESC;`;
         console.log(fetchAllApplicationsForSpecificEmployer);
         const dbfetchAllApplicationsForSpecificEmployer = await connection.dbClient.query(fetchAllApplicationsForSpecificEmployer);
         if(dbfetchAllApplicationsForSpecificEmployer.rowCount){
@@ -555,7 +555,7 @@ async getRecommendedJobs(emailId) {
             const userSkills = dbgetUserSkills.rows[0].emp_skills;
             let userSkillsList = userSkills.split(",");
             userSkillsList = userSkillsList.toLocaleString().toLowerCase().split(',');
-            const getAllListings = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist Inner Join shwift.employerinfo empinfo ON emplist.recruiter_email_id = empinfo.recruiter_mail ORDER BY emplist.created_by DESC;`;
+            const getAllListings = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist Inner Join shwift.employerinfo empinfo ON emplist.recruiter_email_id = empinfo.recruiter_mail ORDER BY emplist.created_at DESC;`;
             const dbGetAllListings = await connection.dbClient.query(getAllListings);
             if(dbGetAllListings.rowCount){
                 dbGetAllListings.rows.forEach(element => {
