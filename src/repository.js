@@ -620,7 +620,7 @@ async uploadPdf(applicantId, base64Data) {
         const type = await imageType(buffer);
         const params = {
             Bucket: 'shwift-images',
-            Key: `pdf/${applicantId}`,
+            Key: `pdf/${applicantId}.pdf`,
             Body: buffer,
             ContentType: type.mime,
             ACL: 'public-read'
