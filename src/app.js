@@ -649,6 +649,32 @@ export const uploadImage = async (request, response) => {
     
 }
 
+export const uploadPdf = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const {base64Pdf} = request.body;
+            const applicantId = uuid();
+            const result = await shwiftRepo.uploadImage(applicantId, base64Pdf);
+            if(result) {
+                console.log(`uploadImage successful`);
+                response.status(200).send(result);
+            } else {
+                console.error(`uploadImage failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`uploadImage failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+    
+}
+
 export const updateApplicationStatus = async (request, response) => {
     try{
         if(request.body && typeof request.body === ('object')) {

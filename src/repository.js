@@ -609,6 +609,33 @@ async uploadImage(applicantId, base64Data) {
     }
 }
 
+async uploadPdf(applicantId, base64Data) {
+    const connection = await dbSetup();
+    try{
+        let matches = base64Data.split(",");
+        let buffer = new Buffer.from(matches[1], 'base64');
+        const type = await imageType(buffer);
+        const params = {
+            Bucket: 'shwift-images',
+            Key: `pdf/${applicantId}`,
+            Body: buffer,
+            ContentType: type.mime,
+            ACL: 'public-read'
+        }
+        const s3 = new AWS.S3();
+        const imgData = await s3.upload(params).promise();
+        setTimeout( () => {}, 1000);
+        return imgData.Location;
+    } catch(error) {
+        console.log(error);
+        if(error){
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
+
 async updateApplicationStatus(recruiter_emailId,employee_emailId,jobId,appStatus) {
     const connection = await dbSetup();
     try{
