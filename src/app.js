@@ -657,10 +657,10 @@ export const uploadPdf = async (request, response) => {
             const applicantId = uuid();
             const result = await shwiftRepo.uploadImage(applicantId, base64Pdf);
             if(result) {
-                console.log(`uploadImage successful`);
+                console.log(`uploadPdf successful`);
                 response.status(200).send(result);
             } else {
-                console.error(`uploadImage failed  - ${JSON.stringify(request.body)}`);
+                console.error(`uploadPdf failed  - ${JSON.stringify(request.body)}`);
                 response.status(400).send({
                     type: 'BAD_REQUEST',
                     message: 'Request failed before completion',
@@ -669,7 +669,7 @@ export const uploadPdf = async (request, response) => {
             }
         }
     } catch(error) {
-        console.log(`uploadImage failed - ${JSON.stringify(error)}`);
+        console.log(`uploadPdf failed - ${JSON.stringify(error)}`);
         response.status(500).send(error);
     }
     
