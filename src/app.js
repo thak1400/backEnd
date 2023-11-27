@@ -600,3 +600,29 @@ export const getRecommendedJobs = async (request, response) => {
         response.status(500).send(error);
     }
 }
+// export const uploadImage = async (request, response) => {
+//     try{
+//         console.log('REQUEST', request.files, request.file, request.body);
+//         if(request.body && typeof request.body === ('object')) {
+//             const shwiftRepo = new ShwiftRepository();
+//             const base64Image = request.body;
+//             const applicantId = uuid();
+//             const result = await shwiftRepo.uploadImage(applicantId, base64Image);
+//             if(result) {
+//                 console.log(`uploadImage successful`);
+//                 response.status(200).send(result);
+//             } else {
+//                 console.error(`uploadImage failed  - ${JSON.stringify(request.body)}`);
+//                 response.status(400).send({
+//                     type: 'BAD_REQUEST',
+//                     message: 'Request failed before completion',
+//                     details: 'Invalid Input request'
+//                 });
+//             }
+//         }
+//     } catch(error) {
+//         console.log(`uploadImage failed - ${JSON.stringify(error)}`);
+//         response.status(500).send(error);
+//     }
+    
+// }

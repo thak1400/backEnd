@@ -1,7 +1,13 @@
 import dotenv from 'dotenv'; // load environment variables from .env file
 import express from 'express';
 import bodyParser from "body-parser";
-import { createListing, deleteListing, newApplication, updateApplication, getApplications, getListing, updateListing, signUp, updatePswd, login, saveJob, deleteSavedJob, fetchSavedJobs, fetchSpecificListing, fetchAllEmployeeInfo, updateEmployeeInfo, getSavedJobs, getApplicationsByEmail, fetchAllEmployerInfo, updateEmployerInfo, getRecommendedJobs, fetchAllApplicationsForSpecificEmployer } from './app.js';
+// import multer from 'multer';
+// const upload = multer({ dest: 'uploads/',fileFilter:function(req,file,cb){
+//   console.log('file is',file)
+//   cb(null,true);
+// }
+// });
+import { createListing, deleteListing, newApplication, updateApplication, getApplications, getListing, updateListing, signUp, updatePswd, login, saveJob, deleteSavedJob, fetchSavedJobs, fetchSpecificListing, fetchAllEmployeeInfo, updateEmployeeInfo, getSavedJobs, getApplicationsByEmail, fetchAllEmployerInfo, updateEmployerInfo, getRecommendedJobs, fetchAllApplicationsForSpecificEmployer, uploadImage } from './app.js';
 dotenv.config();
 const app = express();
 app.use(bodyParser.json())
@@ -62,6 +68,7 @@ app.post('/shwift/updateEmployerInfo', updateEmployerInfo);
 app.post('/shwift/getRecommendedJobs', getRecommendedJobs);
 
 app.post('/shwift/fetchAllApplicationsForSpecificEmployer', fetchAllApplicationsForSpecificEmployer);
+// app.post('/shwift/uploadImage', uploadImage);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
