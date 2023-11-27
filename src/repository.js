@@ -1,10 +1,12 @@
 import { dbSetup } from "../dbConnection/dbSetup.js";
-// import AWS from 'aws-sdk';
-// AWS.config.update({
-//     secretAccessKey: 'tyPKZeASFS5hE7VaACQlBFmWGolruWK55YzCTWYy',
-//     accessKeyId: 'AKIA6QZAOWCY2QZOTMV6',
-//     region: 'us-east-2'
-// })
+import AWS from 'aws-sdk';
+import imageType from 'image-type';
+
+AWS.config.update({
+    secretAccessKey: 'tyPKZeASFS5hE7VaACQlBFmWGolruWK55YzCTWYy',
+    accessKeyId: 'AKIA6QZAOWCY2QZOTMV6',
+    region: 'us-east-2'
+});
 
 export class ShwiftRepository {
     async addListing(jobId, listingData) {
@@ -61,6 +63,26 @@ export class ShwiftRepository {
             }
         } catch(error) {
             if(error){
+                throw new Error(error.message);
+            }
+        } finally {
+            connection.dbClient.release();
+        }
+    }
+
+    async fetchListingByEmployerEmail(emailId) {
+        const connection = await dbSetup();
+        try{
+            const getListing = `SELECT * FROM shwift.employerlisting where recruiter_email_id = '${emailId}';`;
+            const dbResultGetListing = await connection.dbClient.query(getListing);
+            if(dbResultGetListing.rowCount){
+                return dbResultGetListing.rows;
+            } else {
+                return []
+            }
+        } catch(error) {
+            if(error){
+                console.log(error.message);
                 throw new Error(error.message);
             }
         } finally {
@@ -274,22 +296,35 @@ export class ShwiftRepository {
         const fetchSpecificListing = `SELECT * FROM shwift.employerlisting;`;
         const dbGetAllListings = await connection.dbClient.query(fetchSpecificListing);
         if(dbGetAllListings.rowCount){
-            
             for(let i=0;i<dbGetAllListings.rowCount;i++)
             {
                 const currJobId=dbGetAllListings.rows[i].job_id;
-                console.log(currJobId);
-                const fetchFromSavedJobsTbl=`SELECT * FROM shwift.saved_jobs where email_id='${emailId}' and job_id='${currJobId}' `;
-                console.log(fetchFromSavedJobsTbl);
+                // console.log(currJobId);
+                const fetchFromSavedJobsTbl=`SELECT * FROM shwift.saved_jobs where email_id='${emailId}' and job_id='${currJobId}'; `;
+                // console.log(fetchFromSavedJobsTbl);
                 const dbfetchFromSavedJobsTbl = await connection.dbClient.query(fetchFromSavedJobsTbl);
-                console.log(dbfetchFromSavedJobsTbl.rowCount);
+                // console.log(dbfetchFromSavedJobsTbl.rowCount);
                 if(dbfetchFromSavedJobsTbl.rowCount)
-                {
+                {   
                     dbGetAllListings.rows[i].job_saved=true;
                 }
                 else{
                     dbGetAllListings.rows[i].job_saved=false;
                 }
+            }
+            for(let j=0;j<dbGetAllListings.rowCount;j++)
+            {
+                const currRecruiter=dbGetAllListings.rows[j].recruiter_email_id;
+                // console.log(currRecruiter);
+                const fetchFromEmployerInfoTbl=`SELECT * FROM shwift.employerinfo where recruiter_mail='${currRecruiter}'; `;
+                // console.log(fetchFromEmployerInfoTbl);
+                const dbfetchFromEmployerInfoTbl = await connection.dbClient.query(fetchFromEmployerInfoTbl);
+                if(dbfetchFromEmployerInfoTbl.rowCount)
+                {
+                    // console.log(dbfetchFromEmployerInfoTbl.rows[j].org_name);
+                    dbGetAllListings.rows[j].recruiter_name = dbfetchFromEmployerInfoTbl.rows[0].org_name;                    
+                }
+                // console.log(dbfetchFromEmployerInfoTbl.rows[j]);
             }
             // console.log(dbResultGetSpecificListing.rows);    
             return dbGetAllListings.rows;
@@ -531,59 +566,33 @@ async getRecommendedJobs(emailId) {
         connection.dbClient.release();
     }
 }
-// async uploadImage(applicantId, base64Data) {
-//     const connection = await dbSetup();
-//     try{
-//         console.log(base64Data);
-//         let matches = base64Data.split(",");
-//         console.log(JSON.stringify(matches));
-//         let type = matches[1];
-//         let buffer = new Buffer.from(matches[2], 'base64');
-//         // const imageData = new Buffer.from(base64Data.toString(), 'base64');
-//         const params = {
-//             Bucket: 'shwift-images',
-//             Key: `profile/${applicantId}`,
-//             Body: buffer,
-//             ContentType: type,
-//             ACL: 'public-read'
-//         }
-//         const s3 = new AWS.S3();
-//         console.log(params);
-//         setTimeout( s3.putObject(params, function (err, data) {
-//                 if (err) {
-//                     console.log(err);
-//                 } else {
-//                     console.log(data, data.Location);
-//                 }
-//             }), 5000);
-//         // const data = await s3.putObject(params, function (err, data) {
-//         //     if (err) {
-//         //         console.log(err);
-//         //         reject(err);
-//         //     } else {
-//         //         console.log(data);
-//         //         resolve(data);
-//         //     }
-//         // });
-//         // console.log(data);
 
-//         // const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status FROM shwift.employerlisting emp INNER JOIN shwift.myapplications apps ON emp.job_id = apps.job_id WHERE apps.email_id = '${emailId}' ;`;
-//         // console.log(getApplicationsByEmail);
-//         // const dbgetApplicationsByEmail = await connection.dbClient.query(getApplicationsByEmail);
-//         // if(dbgetApplicationsByEmail.rowCount){
-//         //     return dbgetApplicationsByEmail.rows;
-//         // } else {
-//         //     throw Error('Transaction Failed');
-//         // }
-//     } catch(error) {
-//         console.log(error);
-//         if(error){
-//             throw new Error(error.message);
-//         }
-//     } finally {
-//         connection.dbClient.release();
-//     }
-// }
+async uploadImage(applicantId, base64Data) {
+    const connection = await dbSetup();
+    try{
+        let matches = base64Data.split(",");
+        let buffer = new Buffer.from(matches[1], 'base64');
+        const type = await imageType(buffer);
+        const params = {
+            Bucket: 'shwift-images',
+            Key: `profile/${applicantId}`,
+            Body: buffer,
+            ContentType: type.mime,
+            ACL: 'public-read'
+        }
+        const s3 = new AWS.S3();
+        const imgData = await s3.upload(params).promise();
+        setTimeout( () => {}, 1000);
+        return { profileDp: imgData.Location};
+    } catch(error) {
+        console.log(error);
+        if(error){
+            throw new Error(error.message);
+        }
+    } finally {
+        connection.dbClient.release();
+    }
+}
 
 }
 

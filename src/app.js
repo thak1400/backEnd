@@ -100,6 +100,28 @@ export const getListing = async (request, response) => {
     }
 }
 
+export const getListingByEmail = async (request, response) => {
+    try{
+        const shwiftRepo = new ShwiftRepository();
+        const {emailId} = request.params;
+        const result = await shwiftRepo.fetchListingByEmployerEmail(emailId);
+        if(result) {
+            console.log(`getListingByEmail successful`);
+            response.status(200).send(result);
+        } else {
+            console.error(`getListingByEmail Failed  - ${JSON.stringify(request.param)}`);
+            response.status(400).send({
+                type: 'BAD_REQUEST',
+                message: 'Request failed before completion',
+                details: 'Invalid Input request'
+            });
+        }
+    } catch(error) {
+        console.log(`getListingByEmail failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
+}
+
 export const updateApplication = async (request, response) => {
     try{
         if(request.body && typeof request.body === ('object')) {
@@ -600,29 +622,29 @@ export const getRecommendedJobs = async (request, response) => {
         response.status(500).send(error);
     }
 }
-// export const uploadImage = async (request, response) => {
-//     try{
-//         console.log('REQUEST', request.files, request.file, request.body);
-//         if(request.body && typeof request.body === ('object')) {
-//             const shwiftRepo = new ShwiftRepository();
-//             const base64Image = request.body;
-//             const applicantId = uuid();
-//             const result = await shwiftRepo.uploadImage(applicantId, base64Image);
-//             if(result) {
-//                 console.log(`uploadImage successful`);
-//                 response.status(200).send(result);
-//             } else {
-//                 console.error(`uploadImage failed  - ${JSON.stringify(request.body)}`);
-//                 response.status(400).send({
-//                     type: 'BAD_REQUEST',
-//                     message: 'Request failed before completion',
-//                     details: 'Invalid Input request'
-//                 });
-//             }
-//         }
-//     } catch(error) {
-//         console.log(`uploadImage failed - ${JSON.stringify(error)}`);
-//         response.status(500).send(error);
-//     }
+
+export const uploadImage = async (request, response) => {
+    try{
+        if(request.body && typeof request.body === ('object')) {
+            const shwiftRepo = new ShwiftRepository();
+            const {base64Image} = request.body;
+            const applicantId = uuid();
+            const result = await shwiftRepo.uploadImage(applicantId, base64Image);
+            if(result) {
+                console.log(`uploadImage successful`);
+                response.status(200).send(result);
+            } else {
+                console.error(`uploadImage failed  - ${JSON.stringify(request.body)}`);
+                response.status(400).send({
+                    type: 'BAD_REQUEST',
+                    message: 'Request failed before completion',
+                    details: 'Invalid Input request'
+                });
+            }
+        }
+    } catch(error) {
+        console.log(`uploadImage failed - ${JSON.stringify(error)}`);
+        response.status(500).send(error);
+    }
     
-// }
+}

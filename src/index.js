@@ -7,12 +7,13 @@ import bodyParser from "body-parser";
 //   cb(null,true);
 // }
 // });
-import { createListing, deleteListing, newApplication, updateApplication, getApplications, getListing, updateListing, signUp, updatePswd, login, saveJob, deleteSavedJob, fetchSavedJobs, fetchSpecificListing, fetchAllEmployeeInfo, updateEmployeeInfo, getSavedJobs, getApplicationsByEmail, fetchAllEmployerInfo, updateEmployerInfo, getRecommendedJobs, fetchAllApplicationsForSpecificEmployer } from './app.js';
+import { uploadImage, createListing, deleteListing, newApplication, updateApplication, getApplications, getListing, updateListing, signUp, updatePswd, login, saveJob, deleteSavedJob, fetchSavedJobs, fetchSpecificListing, fetchAllEmployeeInfo, updateEmployeeInfo, getSavedJobs, getApplicationsByEmail, fetchAllEmployerInfo, updateEmployerInfo, getRecommendedJobs, fetchAllApplicationsForSpecificEmployer, getListingByEmail } from './app.js';
 dotenv.config();
 const app = express();
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: '5mb' }))
 app.use(
   bodyParser.urlencoded({
+    limit: '5mb',
     extended: true,
   })
 )
@@ -27,6 +28,8 @@ app.get('/', (req, res) => {
 app.post('/shwift/createlisting', createListing);
 
 app.get('/shwift/listing', getListing);
+
+app.get('/shwift/listing/:emailId', getListingByEmail);
 
 // Not in use
 app.get('/shwift/application/:orgName', getApplications);
@@ -68,7 +71,8 @@ app.post('/shwift/updateEmployerInfo', updateEmployerInfo);
 app.post('/shwift/getRecommendedJobs', getRecommendedJobs);
 
 app.post('/shwift/fetchAllApplicationsForSpecificEmployer', fetchAllApplicationsForSpecificEmployer);
-// app.post('/shwift/uploadImage', uploadImage);
+
+app.post('/shwift/uploadImage', uploadImage);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
