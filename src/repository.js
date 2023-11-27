@@ -432,7 +432,7 @@ async getSavedJobs(emailId) {
     const connection = await dbSetup();
     try{
         // const getAllSavedJobs = `SELECT emp.* FROM shwift.employerlisting emp INNER JOIN shwift.saved_jobs jobs ON emp.job_id = jobs.job_id WHERE jobs.email_id = '${emailId}';`;
-        const getAllSavedJobs = `SELECT emp.* FROM shwift.employerlisting emp, shwift.saved_jobs jobs, shwift.employerinfo info WHERE jobs.email_id = '${emailId}' AND emp.job_id = jobs.job_id AND emp.recruiter_email_id = info.recruiter_mail;`;
+        const getAllSavedJobs = `SELECT emp.*, info.employer_dp FROM shwift.employerlisting emp, shwift.saved_jobs jobs, shwift.employerinfo info WHERE jobs.email_id = '${emailId}' AND emp.job_id = jobs.job_id AND emp.recruiter_email_id = info.recruiter_mail;`;
         console.log(getAllSavedJobs);
         const dbgetAllSavedJobs = await connection.dbClient.query(getAllSavedJobs);
         if(dbgetAllSavedJobs.rowCount){
