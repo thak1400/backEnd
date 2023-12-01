@@ -441,20 +441,32 @@ async updateEmployeeInfo(emailId,key,value) {
     }
 }
 
-async getSavedJobs(emailId) {
+async getSavedJobs(userData) {
     const connection = await dbSetup();
     try{
-        // const getAllSavedJobs = `SELECT emp.* FROM shwift.employerlisting emp INNER JOIN shwift.saved_jobs jobs ON emp.job_id = jobs.job_id WHERE jobs.email_id = '${emailId}';`;
-        const getAllSavedJobs = `SELECT emp.*, info.employer_dp FROM shwift.employerlisting emp, shwift.saved_jobs jobs, shwift.employerinfo info WHERE jobs.email_id = '${emailId}' AND emp.job_id = jobs.job_id AND emp.recruiter_email_id = info.recruiter_mail ORDER BY emp.created_at DESC;`;
+        var savedJobs = [];
+        var search = userData.searchText.toLowerCase();
+        const getAllSavedJobs = `SELECT emp.*, info.employer_dp FROM shwift.employerlisting emp, shwift.saved_jobs jobs, shwift.employerinfo info WHERE jobs.email_id = '${userData.emailId}' AND emp.job_id = jobs.job_id AND emp.recruiter_email_id = info.recruiter_mail ORDER BY emp.created_at DESC;`;
         console.log(getAllSavedJobs);
         const dbgetAllSavedJobs = await connection.dbClient.query(getAllSavedJobs);
         if(dbgetAllSavedJobs.rowCount){
-            dbgetAllSavedJobs.rows.forEach(element => {
+            for (var element of dbgetAllSavedJobs.rows) {
                 element.job_saved = true;
-            });
-            return dbgetAllSavedJobs.rows;
+                const fetchFromEmployerInfoTbl=`SELECT * FROM shwift.employerinfo where recruiter_mail='${element.recruiter_email_id}'; `;
+                const dbfetchFromEmployerInfoTbl = await connection.dbClient.query(fetchFromEmployerInfoTbl);
+                if(dbfetchFromEmployerInfoTbl.rowCount)
+                {
+                    element.recruiter_name = dbfetchFromEmployerInfoTbl.rows[0].org_name;                    
+                }
+                if (element.job_title.toLowerCase().indexOf(search) !== -1) {
+                    savedJobs.push(element);
+                } else if (element.recruiter_name.toLowerCase().indexOf(search) !== -1) {
+                    savedJobs.push(element);
+                } 
+            }
+            return savedJobs;
         } else {
-            throw Error('Transaction Failed');
+            return savedJobs;
         }
     } catch(error) {
         if(error){
@@ -465,17 +477,26 @@ async getSavedJobs(emailId) {
     }
 }
 
-async getApplicationsByEmail(emailId) {
+async getApplicationsByEmail(userData) {
     const connection = await dbSetup();
     try{
+        var applications = [];
+        var search = userData.searchText.toLowerCase();
         // const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status FROM shwift.employerlisting emp INNER JOIN shwift.myapplications apps ON emp.job_id = apps.job_id WHERE apps.applicant_email_id = '${emailId}' ;`;
-        const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status, info.employer_dp FROM shwift.employerlisting emp, shwift.myapplications apps, shwift.employerinfo info WHERE apps.applicant_email_id = '${emailId}' AND emp.job_id = apps.job_id AND emp.recruiter_email_id = info.recruiter_mail ORDER BY emp.created_at DESC;`;
+        const getApplicationsByEmail = `SELECT emp.*, apps.app_date, apps.application_status, info.employer_dp, info.org_name FROM shwift.employerlisting emp, shwift.myapplications apps, shwift.employerinfo info WHERE apps.applicant_email_id = '${userData.emailId}' AND emp.job_id = apps.job_id AND emp.recruiter_email_id = info.recruiter_mail ORDER BY emp.created_at DESC;`;
         console.log(getApplicationsByEmail);
         const dbgetApplicationsByEmail = await connection.dbClient.query(getApplicationsByEmail);
         if(dbgetApplicationsByEmail.rowCount){
-            return dbgetApplicationsByEmail.rows;
+            for (var element of dbgetApplicationsByEmail.rows) {
+                if (element.job_title.toLowerCase().indexOf(search) !== -1) {
+                    applications.push(element);
+                } else if (element.org_name.toLowerCase().indexOf(search) !== -1) {
+                    applications.push(element);
+                } 
+            }
+            return applications;
         } else {
-            throw Error('Transaction Failed');
+            return applications;
         }
     } catch(error) {
         if(error){

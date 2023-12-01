@@ -468,9 +468,9 @@ export const getSavedJobs = async (request, response) => {
     try{
         if(request.body && typeof request.body === ('object')) {
             const shwiftRepo = new ShwiftRepository();
-            const {emailId} = request.body;
-            console.log(emailId);
-            const result = await shwiftRepo.getSavedJobs(emailId);
+            const userData = request.body;
+            console.log(userData.emailId);
+            const result = await shwiftRepo.getSavedJobs(userData);
             if(result) {
                 console.log(`getSavedJobs successful`);
                 response.status(200).send(result);
@@ -494,9 +494,9 @@ export const getApplicationsByEmail = async (request, response) => {
     try{
         if(request.body && typeof request.body === ('object')) {
             const shwiftRepo = new ShwiftRepository();
-            const {emailId} = request.body;
-            console.log(emailId);
-            const result = await shwiftRepo.getApplicationsByEmail(emailId);
+            const userData = request.body;
+            console.log(userData.emailId);
+            const result = await shwiftRepo.getApplicationsByEmail(userData);
             if(result) {
                 console.log(`getApplicationsByEmail successful`);
                 response.status(200).send(result);
