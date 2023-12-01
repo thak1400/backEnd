@@ -334,10 +334,10 @@ export const fetchSpecificListing = async (request, response) => {
         if(request.body && typeof request.body === ('object')) {
             const shwiftRepo = new ShwiftRepository();
             // const {jobId}=request.query;
-            const {emailId}=request.body;
+            const userData = request.body;
             // console.log(jobId);
             console.log("Calling fetchSpecificListing");
-            const result = await shwiftRepo.fetchSpecificListing(emailId);
+            const result = await shwiftRepo.fetchSpecificListing(userData);
             if(result) {
                 console.log(`fetchSpecificListing successful`);
                 response.status(200).send(result);

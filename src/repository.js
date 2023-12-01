@@ -306,17 +306,20 @@ export class ShwiftRepository {
         }
     }
 
-    async fetchSpecificListing(emailId) {
+    async fetchSpecificListing(userData) {
     const connection = await dbSetup();
     try{
         const fetchSpecificListing = `SELECT emplist.*, empinfo.employer_dp FROM shwift.employerlisting emplist INNER JOIN shwift.employerinfo empinfo on emplist.recruiter_email_id=empinfo.recruiter_mail ORDER BY emplist.created_at DESC;`;
+        console.log(fetchSpecificListing);
         const dbGetAllListings = await connection.dbClient.query(fetchSpecificListing);
+        var jobs = [];
+        var search = userData.searchText.toLowerCase();
         if(dbGetAllListings.rowCount){
             for(let i=0;i<dbGetAllListings.rowCount;i++)
             {
                 const currJobId=dbGetAllListings.rows[i].job_id;
                 // console.log(currJobId);
-                const fetchFromSavedJobsTbl=`SELECT * FROM shwift.saved_jobs where email_id='${emailId}' and job_id='${currJobId}'; `;
+                const fetchFromSavedJobsTbl=`SELECT * FROM shwift.saved_jobs where email_id='${userData.emailId}' and job_id='${currJobId}'; `;
                 // console.log(fetchFromSavedJobsTbl);
                 const dbfetchFromSavedJobsTbl = await connection.dbClient.query(fetchFromSavedJobsTbl);
                 // console.log(dbfetchFromSavedJobsTbl.rowCount);
@@ -342,10 +345,17 @@ export class ShwiftRepository {
                 }
                 // console.log(dbfetchFromEmployerInfoTbl.rows[j]);
             }
-            // console.log(dbResultGetSpecificListing.rows);    
-            return dbGetAllListings.rows;
+            // console.log(dbResultGetSpecificListing.rows);  
+            dbGetAllListings.rows.forEach(element => {
+                if (element.job_title.toLowerCase().indexOf(search) !== -1) {
+                    jobs.push(element);
+                } else if (element.recruiter_name.toLowerCase().indexOf(search) !== -1) {
+                    jobs.push(element);
+                } 
+            });  
+            return jobs;
         } else {
-            throw Error('Transaction Failed');
+            return jobs;
         }
     } catch(error) {
         if(error){
