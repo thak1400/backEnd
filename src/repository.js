@@ -551,14 +551,14 @@ async updateEmployerInfo(emailId,key,value) {
     }
 }
 
-async fetchAllApplicationsForSpecificEmployer(emailId) {
+async fetchAllApplicationsForSpecificEmployer(userData) {
     const connection = await dbSetup();
     try{
         var applications = [];
         var search = userData.searchText.toLowerCase();
         const fetchAllApplicationsForSpecificEmployer = `SELECT u.first_name, u.last_name, u.email_id, u.phone_num, emp.employee_dp, job.job_title, emp.availability, job.job_id, apps.resume_url
         from shwift.myapplications apps, shwift.userinfo u, shwift.employerlisting job, shwift.employeeinfo emp 
-        where apps.employer_email_id ='${emailId}' AND apps.applicant_email_id = u.email_id AND apps.job_id = job.job_id AND u.email_id = emp.employee_id ORDER BY job.created_at DESC;`;
+        where apps.employer_email_id ='${userData.emailId}' AND apps.applicant_email_id = u.email_id AND apps.job_id = job.job_id AND u.email_id = emp.employee_id ORDER BY job.created_at DESC;`;
         console.log(fetchAllApplicationsForSpecificEmployer);
         const dbfetchAllApplicationsForSpecificEmployer = await connection.dbClient.query(fetchAllApplicationsForSpecificEmployer);
         if(dbfetchAllApplicationsForSpecificEmployer.rowCount){
