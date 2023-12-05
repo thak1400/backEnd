@@ -404,7 +404,7 @@ async signUp(serialNum,userData) {
 async fetchAllEmployeeInfo(emailId) {
     const connection = await dbSetup();
     try{
-        const fetchAllEmployeeInfo = `SELECT * from shwift.employeeinfo where employee_id='${emailId}' ;`;
+        const fetchAllEmployeeInfo = `SELECT u.email_id, u.phone_num, emp.* from shwift.userinfo u, shwift.employeeinfo emp where employee_id='${emailId}' and u.email_id = emp.employee_id ;`;
         console.log(fetchAllEmployeeInfo);
         const dbfetchAllEmployeeInfo = await connection.dbClient.query(fetchAllEmployeeInfo);
         if(dbfetchAllEmployeeInfo.rowCount){
