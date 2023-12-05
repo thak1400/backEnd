@@ -576,9 +576,9 @@ export const fetchAllApplicationsForSpecificEmployer = async (request, response)
     try{
         if(request.body && typeof request.body === ('object')) {
             const shwiftRepo = new ShwiftRepository();
-            const {emailId} = request.body;
-            console.log(emailId);
-            const result = await shwiftRepo.fetchAllApplicationsForSpecificEmployer(emailId);
+            const userData = request.body;
+            console.log(userData.emailId);
+            const result = await shwiftRepo.fetchAllApplicationsForSpecificEmployer(userData);
             if(result) {
                 console.log(`fetchAllApplicationsForSpecificEmployer successfully`);
                 response.status(200).send(result);

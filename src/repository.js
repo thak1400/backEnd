@@ -554,16 +554,26 @@ async updateEmployerInfo(emailId,key,value) {
 async fetchAllApplicationsForSpecificEmployer(emailId) {
     const connection = await dbSetup();
     try{
+        var applications = [];
+        var search = userData.searchText.toLowerCase();
         const fetchAllApplicationsForSpecificEmployer = `SELECT u.first_name, u.last_name, u.email_id, u.phone_num, emp.employee_dp, job.job_title, emp.availability, job.job_id, apps.resume_url
         from shwift.myapplications apps, shwift.userinfo u, shwift.employerlisting job, shwift.employeeinfo emp 
         where apps.employer_email_id ='${emailId}' AND apps.applicant_email_id = u.email_id AND apps.job_id = job.job_id AND u.email_id = emp.employee_id ORDER BY job.created_at DESC;`;
         console.log(fetchAllApplicationsForSpecificEmployer);
         const dbfetchAllApplicationsForSpecificEmployer = await connection.dbClient.query(fetchAllApplicationsForSpecificEmployer);
         if(dbfetchAllApplicationsForSpecificEmployer.rowCount){
-            return dbfetchAllApplicationsForSpecificEmployer.rows;
+            for (var element of dbfetchAllApplicationsForSpecificEmployer.rows) {
+                if (element.job_title.toLowerCase().indexOf(search) !== -1) {
+                    applications.push(element);
+                } else if (element.first_name.toLowerCase().indexOf(search) !== -1) {
+                    applications.push(element);
+                } else if (element.last_name.toLowerCase().indexOf(search) !== -1) {
+                    applications.push(element);
+                } 
+            }
+            return applications;
         } else {
-            // throw Error('Transaction Failed');
-            return [];
+            return applications;
         }
     } catch(error) {
         if(error){
